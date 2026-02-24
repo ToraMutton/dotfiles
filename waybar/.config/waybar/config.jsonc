@@ -1,0 +1,153 @@
+{
+    "layer": "top",
+    "position": "top",
+    "margin": "5 5 0 5",
+    "height": 38,
+    "modules-left": [
+        "custom/launcher",
+        "custom/media_prev",
+        "custom/media_play_pause",
+        "custom/media_next",
+        "custom/media"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "tray",
+        "cpu",
+        "temperature",
+        "memory",
+        "network",
+        "pulseaudio",
+        "custom/power"
+    ],
+    // modules-left
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{icon}",
+        "format-icons": {
+            "default": "",
+            "active": "",
+            "urgent": ""
+        }
+    },
+    "custom/launcher": {
+        "format": "",
+        "on-click": "hyprlauncher",
+        "tooltip": false
+    },
+    "custom/media": {
+        "format": "{}",
+        "return-type": "json",
+        "max-length": 60,
+        "exec": "/usr/bin/python3 ~/.config/waybar/scripts/mediaplayer.py 2> /dev/null",
+        "on-click": "playerctl play-pause && sleep 0.1 && pkill -RTMIN+8 waybar",
+        "on-click-right": "playerctl next && sleep 0.1 && pkill -RTMIN+8 waybar",
+        "signal": 8,
+        "interval": 1,
+        "tooltip": false
+    },
+    "custom/media_prev": {
+        "format": "{}",
+        "exec": "playerctl status 2>/dev/null | grep -qE 'Playing|Paused' && echo '⏮' || echo ''",
+        "interval": 1,
+        "on-click": "playerctl previous && sleep 0.1 && pkill -RTMIN+8 waybar",
+        "tooltip": false
+    },
+    "custom/media_play_pause": {
+        "format": "{icon}",
+        "return-type": "json",
+        "exec": "/usr/bin/python3 ~/.config/waybar/scripts/mediaplayer.py 2> /dev/null",
+        "format-icons": {
+            "playing": "⏸",
+            "paused": "▶",
+            "default": ""
+        },
+        "on-click": "playerctl play-pause && sleep 0.1 && pkill -RTMIN+8 waybar",
+        "signal": 8,
+        "interval": 1,
+        "tooltip": false
+    },
+    "custom/media_next": {
+        "format": "{}",
+        "exec": "playerctl status 2>/dev/null | grep -qE 'Playing|Paused' && echo '⏭' || echo ''",
+        "interval": 1,
+        "on-click": "playerctl next && sleep 0.1 && pkill -RTMIN+8 waybar",
+        "tooltip": false
+    },
+    // modules-center
+    "clock": {
+        "interval": 1,
+        "format": "  {:%m/%d(%a) %H:%M}",
+        "format-alt": "  {:%Y/%m/%d (%a) %H:%M:%S}",
+        "tooltip-format": "<tt><big>{calendar}</big></tt>",
+        "calendar": {
+            "mode": "month",
+            "format": {
+                "months": "<span color='#cdd6f4'><b>{}</b></span>",
+                "days": "<span color='#cdd6f4'><b>{}</b></span>",
+                "weekdays": "<span color='#74c7ec'><b>{}</b></span>",
+                "today": "<span color='#1e1e2e' background='#89dceb'><b>{}</b></span>"
+            }
+        }
+    },
+    // modules-right
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    },
+    "cpu": {
+        "format": "  {usage:>2}%",
+        "tooltip": false,
+        "states": {
+            "warning": 70,
+            "critical": 90
+        }
+    },
+    "temperature": {
+        "hwmon-path": "/sys/class/hwmon/hwmon3/temp1_input",
+        "critical-threshold": 80,
+        "format": "{icon} {temperatureC}℃",
+        "format-icons": [
+            "",
+            "",
+            ""
+        ],
+        "tooltip": false
+    },
+    "memory": {
+        "format": "  {used:0.1f}GB",
+        "tooltip": false,
+        "states": {
+            "warning": 70,
+            "critical": 90
+        }
+    },
+    "network": {
+        "format-wifi": "  {essid}",
+        "format-ethernet": "  {bandwidthDownOctets}",
+        "format-disconnected": "  Disconnected",
+        "tooltip": false
+    },
+    "pulseaudio": {
+        "format": "{icon}  {volume}%",
+        "format-muted": "  Muted",
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+        "format-icons": {
+            "default": [
+                "",
+                "",
+                ""
+            ]
+        }
+    },
+    "custom/power": {
+        "format": "⏻",
+        "on-click": "wlogout -b 3 -T 60 -B 1200 -L 1900 -R 20",
+        "tooltip": false
+    }
+}

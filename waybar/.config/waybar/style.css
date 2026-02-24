@@ -1,0 +1,128 @@
+/* =============================================================================
+ * Waybar 
+ * =========================================================================== */
+
+/* 色の定義 */
+@define-color base   rgba(30, 30, 46, 0.85);
+@define-color text   #cdd6f4;
+@define-color sky    #89dceb;
+@define-color ocean  #74c7ec;
+@define-color select rgba(137, 220, 235, 0.3);
+@define-color red    #f38ba8;
+@define-color yellow #f9e2af;
+
+/* 全体設定 */
+* {
+    font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font", "Noto Sans CJK JP", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: @text;
+    border: none;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+/* カプセル共通枠 */
+.modules-left,
+.modules-center,
+.modules-right {
+    background-color: @base;
+    border: 1.5px solid @ocean;
+    border-radius: 20px;
+    margin: 0px 6px;
+    padding: 2px 12px;
+}
+
+/* modules-left */
+
+/* Archアイコン */
+#custom-launcher {
+    color: @sky;
+    font-size: 20px;
+    padding: 0 12px 0 4px;
+    margin-right: 6px;
+}
+
+/* メディアプレーヤー */
+#custom-media_prev,
+#custom-media_play_pause,
+#custom-media_next {
+    font-size: 22px;
+    min-width: 20px;
+    min-height: 24px;
+    padding: 0px 8px;
+    margin: 0 4px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#custom-media_prev:hover,
+#custom-media_play_pause:hover,
+#custom-media_next:hover {
+    color: @sky;
+    background-color: transparent;
+    text-shadow: 0px 0px 12px @sky;
+}
+
+#custom-media_prev:active,
+#custom-media_play_pause:active,
+#custom-media_next:active {
+    color: @ocean;
+    text-shadow: none;
+    transition: all 0.05s ease;
+}
+
+/* 曲名 */
+#custom-media {
+    margin: 0 8px;
+    padding-bottom: 1px;
+}
+
+/* modules-center */ 
+#clock {
+    color: @sky;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+/* modules-right */
+
+/* 全モジュールの隙間 */
+#tray, #cpu, #temperature, #memory, #network, #pulseaudio, #custom-power {
+    margin: 0 8px;
+}
+
+/* 音量の幅固定 */
+#pulseaudio {
+    min-width: 50px;
+}
+
+/* 電源ボタン */
+#custom-power {
+    color: @red;
+    margin-left: 12px;
+}
+
+/* その他演出 */
+
+/* 警告: 70%超え => 黄色 */
+#cpu.warning, 
+#memory.warning {
+    color: @yellow;
+}
+
+/* 危険: 90%超え or 80℃超え => 赤色 + 点滅 */
+#cpu.critical, 
+#memory.critical,
+#temperature.critical {
+    color: @red;
+    animation: blink 0.8s infinite alternate;
+}
+
+@keyframes blink {
+    from { color: @red; }
+    to   { color: @text; }
+}
