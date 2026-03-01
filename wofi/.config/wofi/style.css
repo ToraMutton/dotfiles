@@ -1,0 +1,42 @@
+window {
+    margin: 0px;
+    border: 2px solid #33ccff; /* 水色のボーダー */
+    background-color: rgba(26, 26, 26, 0.9); /* 背景は少し透ける黒 */
+    border-radius: 10px; /* Hyprlandと同じ角丸 */
+    font-family: sans-serif;
+}
+
+#input {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #00ff99; /* 入力欄は緑のボーダー */
+    color: #ffffff;
+    background-color: rgba(50, 50, 50, 0.5);
+    border-radius: 5px;
+}
+
+#inner-box {
+    background-color: transparent;
+}
+
+#outer-box {
+    margin: 5px;
+    background-color: transparent;
+}
+
+#text {
+    margin: 5px;
+    color: #e6e6e6; /* 通常の文字は白に近いグレー */
+}
+
+/* 選択中のアイテム */
+#entry:selected {
+    background-color: rgba(51, 204, 255, 0.3); /* 水色がふんわり光る */
+    border-radius: 5px;
+    outline: none;
+}
+
+#text:selected {
+    color: #00ff99; /* 選択中の文字はネオングリーンに */
+    font-weight: bold;
+}
