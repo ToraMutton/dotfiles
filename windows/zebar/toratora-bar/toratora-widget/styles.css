@@ -1,0 +1,31 @@
+body {
+  color: rgb(255 255 255 / 90%);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 15px;
+  background-color: rgba(10, 10, 12, 0.8);
+  color: #cdd6f4;
+  font-family: 'JetBrains Mono', 'Hack', sans-serif;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+  margin-right: 4px;
+}
