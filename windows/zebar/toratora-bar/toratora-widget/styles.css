@@ -21,7 +21,6 @@ body {
   background-color: transparent;
   border: none;
   backdrop-filter: blur(8px); /* すりガラス効果 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
 }
 
@@ -31,7 +30,7 @@ body {
   gap: 8px;
   background-color: rgba(17, 17, 27, 0.85);
   backdrop-filter: blur(10px);
-  padding: 4px 16px;
+  padding: 2px 16px;
   border-radius: 100px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -73,10 +72,13 @@ body {
 
 /* 各種チップの装飾 */
 .chip {
+  display: flex;
+  align-items: center;
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 6px;
   font-size: 12px;
+  line-height: 1;
   transition: all 0.2s;
 }
 .chip:hover {
@@ -84,8 +86,22 @@ body {
 }
 
 .chip i {
+  display: flex;
   margin-right: 6px;
   font-size: 16px;
+}
+
+.chip.danger {
+  background: rgba(248, 75, 75, 0.8);
+  color: #11111b;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
 /* 時計は少し目立たせる */

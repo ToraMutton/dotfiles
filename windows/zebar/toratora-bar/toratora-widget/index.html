@@ -27,7 +27,9 @@
     cpu: { type: 'cpu' },
     battery: { type: 'battery' },
     memory: { type: 'memory' },
-    weather: { type: 'weather' },
+    // weather: { type: 'weather' },
+    network: { type: 'network' },
+    audio: { type: 'audio' },
     media: { type: 'media' },
     audio: { type: 'audio' },
     glazewm: { type: 'glazewm' },
@@ -70,17 +72,35 @@
 
         {/* 右側：システムステータス */}
         <div className="section right">
+        
+          {/* ネットワーク (Wi-FiならSSID、それ以外なら接続タイプを表示) */}
+          {output.network?.defaultInterface && (
+            <div className="chip net">
+              {output.network.defaultInterface.type === 'wifi' ? (
+                <><i className="ph ph-wifi-high"></i> {output.network.defaultInterface.ssid}</>
+              ) : (
+                <><i className="ph ph-plugs-connected"></i> {output.network.defaultInterface.type}</>
+              )}
+            </div>
+          )}
+
+          {/* オーディオ (音量) */}
+          {output.audio?.defaultPlaybackDevice && (
+            <div className="chip audio">
+              <i className="ph ph-speaker-high"></i> {Math.round(output.audio.defaultPlaybackDevice.volume)}%
+            </div>
+          )}
+
           <div className="chip cpu">
             <i className="ph ph-cpu"></i> {Math.round(output.cpu?.usage)}%
           </div>
-          <div className="chip mem">
+
+          <div className= {`chip mem ${output.memory?.usage > 80 ? 'danger' : ''}`}>
             <i className="ph ph-memory"></i> {Math.round(output.memory?.usage)}%
           </div>
-          <div className="chip bat">
+
+          <div className={`chip bat ${output.battery?.chargePercent < 20 ? 'danger' : ''}`}>
             <i className="ph ph-battery-full"></i> {Math.round(output.battery?.chargePercent)}%
-          </div>
-          <div className="chip weather">
-            <i className="ph ph-thermometer"></i> {Math.round(output.weather?.celsiusTemp)}°C
           </div>
         </div>
       </div>
