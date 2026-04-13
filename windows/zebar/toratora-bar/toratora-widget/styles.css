@@ -18,7 +18,8 @@ body {
   align-items: center;
   height: 100%;
   padding: 0 10px;
-  background-color: rgba(17, 17, 27, 0.7); /* 透けるダーク背景 */
+  background-color: transparent;
+  border: none;
   backdrop-filter: blur(8px); /* すりガラス効果 */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -27,6 +28,12 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  background-color: rgba(17, 17, 27, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 4px 16px;
+  border-radius: 100px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ワークスペースのドット */
@@ -34,16 +41,27 @@ body {
   display: flex;
   gap: 5px;
 }
+
 .ws-dot {
-  padding: 2px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  border-radius: 50%;
   font-weight: bold;
   font-size: 11px;
+  color: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
 .ws-dot.active {
-  background: #cba6f7; /* フォーカスしてる画面は紫 */
+  width: auto;
+  padding: 0 12px;
+  background: #48a37e;
   color: #11111b;
+  border-radius: 12px;
 }
 
 /* 各種チップの装飾 */
