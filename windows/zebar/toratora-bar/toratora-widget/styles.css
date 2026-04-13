@@ -1,31 +1,60 @@
 body {
-  color: rgb(255 255 255 / 90%);
-  font-family: ui-monospace, monospace;
-  font-size: 12px;
+  margin: 0;
+  padding: 0;
+  color: #cdd6f4;
+  font-family: 'JetBrains Mono', 'Hack', 'Segoe UI', sans-serif;
   overflow: hidden;
-}
-
-html,
-body,
-#root {
-  height: 100%;
 }
 
 #app {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 3分割 */
   align-items: center;
   height: 100%;
-  padding: 0 15px;
-  background-color: rgba(10, 10, 12, 0.8);
-  color: #cdd6f4;
-  font-family: 'JetBrains Mono', 'Hack', sans-serif;
+  padding: 0 10px;
+  background-color: rgba(17, 17, 27, 0.7); /* 透けるダーク背景 */
+  backdrop-filter: blur(8px); /* すりガラス効果 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.chip {
-  display: inline-block;
-  padding: 4px 8px;
+.section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ワークスペースのドット */
+.workspaces {
+  display: flex;
+  gap: 5px;
+}
+.ws-dot {
+  padding: 2px 10px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  background: transparent;
-  margin-right: 4px;
+  font-weight: bold;
+  font-size: 11px;
+}
+.ws-dot.active {
+  background: #cba6f7; /* フォーカスしてる画面は紫 */
+  color: #11111b;
+}
+
+/* 各種チップの装飾 */
+.chip {
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 時計は少し目立たせる */
+.time-chip {
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #89b4fa;
 }

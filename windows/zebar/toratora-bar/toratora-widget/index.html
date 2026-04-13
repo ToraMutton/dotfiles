@@ -1,86 +1,82 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Custom styles. -->
-    <link rel="stylesheet" type="text/css" href="./styles.css" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Allows React to be run buildless via "text/babel" script below. -->
-    <script
-      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
-      integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo="
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <div id="root"></div>
+  <!-- Custom styles. -->
+  <link rel="stylesheet" type="text/css" href="./styles.css" />
 
-    <script type="text/babel" data-type="module">
-      import React, {
-        useState,
-        useEffect,
-      } from 'https://esm.sh/react@18?dev';
-      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
-      import * as zebar from 'https://esm.sh/zebar@3.0';
+  <!-- Allows React to be run buildless via "text/babel" script below. -->
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+    integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
+</head>
 
-      const providers = zebar.createProviderGroup({
-        cpu: { type: 'cpu' },
-        battery: { type: 'battery' },
-        memory: { type: 'memory' },
-        weather: { type: 'weather' },
-        media: { type: 'media' },
-        audio: { type: 'audio' },
-      });
+<body>
+  <div id="root"></div>
 
-      createRoot(document.getElementById('root')).render(<App />);
+  <script type="text/babel" data-type="module">
+  import React, { useState, useEffect } from 'https://esm.sh/react@18?dev';
+  import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+  import * as zebar from 'https://esm.sh/zebar@3.0';
 
-      function App() {
-        const [output, setOutput] = useState(providers.outputMap);
+  const providers = zebar.createProviderGroup({
+    cpu: { type: 'cpu' },
+    battery: { type: 'battery' },
+    memory: { type: 'memory' },
+    weather: { type: 'weather' },
+    media: { type: 'media' },
+    audio: { type: 'audio' },
+    glazewm: { type: 'glazewm' },
+    date: { type: 'date', formatting: 'EEE d MMM HH:mm' }, // 時計
+  });
 
-        useEffect(() => {
-          providers.onOutput(() => setOutput(providers.outputMap));
-        }, []);
+  createRoot(document.getElementById('root')).render(<App />);
 
-        return (
-          <div id="app">
-            {output.audio?.defaultPlaybackDevice && (
-              <div className="chip">
-                {output.audio.defaultPlaybackDevice.name}-
-                {output.audio.defaultPlaybackDevice.volume}
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="2"
-                  value={output.audio.defaultPlaybackDevice.volume}
-                  onChange={e =>
-                    output.audio.setVolume(e.target.valueAsNumber)
-                  }
-                />
+  function App() {
+    const [output, setOutput] = useState(providers.outputMap);
+
+    useEffect(() => {
+      providers.onOutput(() => setOutput(providers.outputMap));
+    }, []);
+
+    return (
+      <div id="app">
+        {/* 左側：ワークスペースとメディア */}
+        <div className="section left">
+          <div className="workspaces">
+            {output.glazewm?.currentWorkspaces.map(ws => (
+              <div key={ws.name} className={`ws-dot ${ws.hasFocus ? 'active' : ''}`}>
+                {ws.displayName ?? ws.name}
               </div>
-            )}
-            <div className="chip">
-              Media: {output.media?.currentSession?.title}-
-              {output.media?.currentSession?.artist}
-              <button onClick={() => output.media?.togglePlayPause()}>
-                ⏯
-              </button>
-            </div>
-            <div className="chip">CPU usage: {output.cpu?.usage}</div>
-            <div className="chip">
-              Battery charge: {output.battery?.chargePercent}
-            </div>
-            <div className="chip">
-              Memory usage: {output.memory?.usage}
-            </div>
-            <div className="chip">
-              Weather temp: {output.weather?.celsiusTemp}
-            </div>
+            ))}
           </div>
-        );
-      }
-    </script>
-  </body>
+          {output.media?.currentSession && (
+            <div className="chip media">
+              🎵 {output.media.currentSession.title.substring(0, 20)}...
+            </div>
+          )}
+        </div>
+
+        {/* 中央：時計 */}
+        <div className="section center">
+          <div className="time-chip">
+            {output.date?.formatted}
+          </div>
+        </div>
+
+        {/* 右側：システムステータス */}
+        <div className="section right">
+          <div className="chip cpu">💻 {Math.round(output.cpu?.usage)}%</div>
+          <div className="chip mem">🧠 {Math.round(output.memory?.usage)}%</div>
+          <div className="chip bat">🔋 {Math.round(output.battery?.chargePercent)}%</div>
+          <div className="chip weather">🌡️ {Math.round(output.weather?.celsiusTemp)}°C</div>
+        </div>
+      </div>
+    );
+  }
+</script>
+</body>
+
 </html>
