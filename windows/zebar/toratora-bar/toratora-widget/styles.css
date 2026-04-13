@@ -22,6 +22,7 @@ body {
   border: none;
   backdrop-filter: blur(8px); /* すりガラス効果 */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .section {
@@ -34,6 +35,12 @@ body {
   border-radius: 100px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section.center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* ワークスペースのドット */
@@ -59,7 +66,7 @@ body {
 .ws-dot.active {
   width: auto;
   padding: 0 12px;
-  background: #48a37e;
+  background: #57adb0;
   color: #11111b;
   border-radius: 12px;
 }
