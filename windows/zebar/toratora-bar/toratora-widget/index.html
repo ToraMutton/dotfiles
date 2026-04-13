@@ -8,6 +8,8 @@
   <!-- Custom styles. -->
   <link rel="stylesheet" type="text/css" href="./styles.css" />
 
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
   <!-- Allows React to be run buildless via "text/babel" script below. -->
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
     integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
@@ -68,10 +70,18 @@
 
         {/* 右側：システムステータス */}
         <div className="section right">
-          <div className="chip cpu">💻 {Math.round(output.cpu?.usage)}%</div>
-          <div className="chip mem">🧠 {Math.round(output.memory?.usage)}%</div>
-          <div className="chip bat">🔋 {Math.round(output.battery?.chargePercent)}%</div>
-          <div className="chip weather">🌡️ {Math.round(output.weather?.celsiusTemp)}°C</div>
+          <div className="chip cpu">
+            <i className="ph ph-cpu"></i> {Math.round(output.cpu?.usage)}%
+          </div>
+          <div className="chip mem">
+            <i className="ph ph-memory"></i> {Math.round(output.memory?.usage)}%
+          </div>
+          <div className="chip bat">
+            <i className="ph ph-battery-full"></i> {Math.round(output.battery?.chargePercent)}%
+          </div>
+          <div className="chip weather">
+            <i className="ph ph-thermometer"></i> {Math.round(output.weather?.celsiusTemp)}°C
+          </div>
         </div>
       </div>
     );
