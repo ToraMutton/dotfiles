@@ -1,0 +1,112 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #cdd6f4;
+  font-family: 'JetBrains Mono', 'Hack', 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  justify-content: space-between; /* 3分割 */
+  align-items: center;
+  height: 100%;
+  padding: 0 10px;
+  background-color: transparent;
+  border: none;
+  backdrop-filter: blur(8px); /* すりガラス効果 */
+  position: relative;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(17, 17, 27, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 2px 16px;
+  border-radius: 100px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section.center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ワークスペースのドット */
+.workspaces {
+  display: flex;
+  gap: 5px;
+}
+
+.ws-dot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 11px;
+  color: transparent;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ws-dot.active {
+  width: auto;
+  padding: 0 12px;
+  background: #57adb0;
+  color: #11111b;
+  border-radius: 12px;
+}
+
+/* 各種チップの装飾 */
+.chip {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+.chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.chip i {
+  display: flex;
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.chip.danger {
+  background: rgba(248, 75, 75, 0.8);
+  color: #11111b;
+  font-weight: bold;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* 時計は少し目立たせる */
+.time-chip {
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #89b4fa;
+}
