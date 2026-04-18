@@ -1,4 +1,3 @@
-if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
 
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
@@ -71,6 +70,37 @@ return {
             )
           end,
           desc = "Close buffer from tabline",
+        },
+
+        -- UEC SSH 自動化 ↓↓↓
+        ["<Leader>r"] = {
+          function()
+            local path = vim.fn.expand("%:p:h")
+            local home = vim.fn.expand("$HOME")
+            local cmd = ""
+
+            if path:find(home .. "/uec_ced") then  -- cedの時の処理
+              local remote_path = path:gsub(home .. "/uec_ced", "~")
+              cmd = string.format("ssh -t ced-orange 'cd %s && exec bash'", remote_path)
+            elseif path:find(home .. "/uec_sol") then -- solの時の処理
+              local remote_path = path:gsub(home .. "/uec_sol", "~")
+              cmd = string.format("ssh -t uec-sol 'cd %s && exec bash'", remote_path)
+            else
+              vim.notify("ここは大学のマウント先ではありません", vim.log.levels.WARN)
+              return
+            end
+
+            local Terminal = require("toggleterm.terminal").Terminal
+            local uec_term = Terminal:new({
+              cmd = cmd,
+              direction = "horizontal",
+              on_open = function(term)
+                vim.cmd("startinsert!")
+              end,
+            })
+            uec_term:toggle()
+          end,
+          desc = "大学サーバーへ自動SSH接続",
         },
 
         -- tables with just a `desc` key will be registered with which-key if it's installed
