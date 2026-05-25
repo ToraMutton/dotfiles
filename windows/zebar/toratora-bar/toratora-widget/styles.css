@@ -8,32 +8,25 @@ body {
   margin: 0;
   padding: 0;
   color: #cdd6f4;
+  background-color: #11111b; /* バー全体の背景をフラットな黒に */
   font-family: 'JetBrains Mono', 'Hack', 'Segoe UI', sans-serif;
   overflow: hidden;
 }
 
 #app {
   display: flex;
-  justify-content: space-between; /* 3分割 */
+  justify-content: space-between;
   align-items: center;
-  height: 100%;
-  padding: 0 10px;
-  background-color: transparent;
-  border: none;
-  backdrop-filter: blur(8px); /* すりガラス効果 */
+  height: 100vh; /* Zebarのウィンドウ高さをフルに使う */
+  padding: 0 16px;
   position: relative;
 }
 
 .section {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: rgba(17, 17, 27, 0.85);
-  backdrop-filter: blur(10px);
-  padding: 2px 16px;
-  border-radius: 100px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 20px; /* 要素同士の隙間を少し広げて見やすく */
+  height: 100%;
 }
 
 .section.center {
@@ -42,71 +35,75 @@ body {
   transform: translateX(-50%);
 }
 
-/* ワークスペースのドット */
 .workspaces {
   display: flex;
-  gap: 5px;
+  gap: 0; /* 隙間をなくして一体感を出す */
+  height: 100%;
 }
 
 .ws-dot {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+  padding: 0 12px;
   font-weight: bold;
-  font-size: 11px;
-  color: transparent;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  font-size: 13px;
+  color: #6c7086; /* 非アクティブは暗め */
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
 .ws-dot.active {
-  width: auto;
-  padding: 0 12px;
-  background: #57adb0;
-  color: #11111b;
-  border-radius: 12px;
+  color: #89b4fa; /* アクティブは青 */
+  border-bottom: 2px solid #89b4fa;
+  background: rgba(255, 255, 255, 0.05); /* うっすらハイライト */
 }
 
-/* 各種チップの装飾 */
+/* 🎵 メディア */
+.chip.media {
+  color: #a6e3a1;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+/* ⏱️ 時計 */
+.time-chip {
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #cba6f7; /* 紫アクセント */
+  font-size: 14px;
+}
+
 .chip {
   display: flex;
   align-items: center;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1;
-  transition: all 0.2s;
-}
-.chip:hover {
-  background: rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .chip i {
   display: flex;
   margin-right: 6px;
-  font-size: 16px;
+  font-size: 18px;
 }
 
+.chip.net i { color: #f38ba8; }    /* 赤 */
+.chip.audio i { color: #fab387; }  /* オレンジ */
+.chip.cpu i { color: #f9e2af; }    /* 黄色 */
+.chip.mem i { color: #89dceb; }    /* 水色 */
+.chip.bat i { color: #a6e3a1; }    /* 緑 */
+
+/* 警告時のスタイル */
 .chip.danger {
-  background: rgba(248, 75, 75, 0.8);
-  color: #11111b;
-  font-weight: bold;
+  color: #f38ba8;
   animation: pulse 1.5s infinite;
+}
+.chip.danger i {
+  color: #f38ba8;
 }
 
 @keyframes pulse {
   0% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.5; }
   100% { opacity: 1; }
-}
-
-/* 時計は少し目立たせる */
-.time-chip {
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #89b4fa;
 }
