@@ -8,7 +8,7 @@ body {
   margin: 0;
   padding: 0;
   color: #cdd6f4;
-  background-color: #11111b; /* バー全体の背景をフラットな黒に */
+  background-color: #11111b;
   font-family: 'JetBrains Mono', 'Hack', 'Segoe UI', sans-serif;
   overflow: hidden;
 }
@@ -17,7 +17,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100vh; /* Zebarのウィンドウ高さをフルに使う */
+  height: 100vh;
   padding: 0 16px;
   position: relative;
 }
@@ -25,7 +25,7 @@ body {
 .section {
   display: flex;
   align-items: center;
-  gap: 20px; /* 要素同士の隙間を少し広げて見やすく */
+  gap: 20px;
   height: 100%;
 }
 
@@ -37,7 +37,7 @@ body {
 
 .workspaces {
   display: flex;
-  gap: 0; /* 隙間をなくして一体感を出す */
+  gap: 0;
   height: 100%;
 }
 
@@ -48,15 +48,15 @@ body {
   padding: 0 12px;
   font-weight: bold;
   font-size: 13px;
-  color: #6c7086; /* 非アクティブは暗め */
+  color: #6c7086;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
 
 .ws-dot.active {
-  color: #89b4fa; /* アクティブは青 */
+  color: #89b4fa;
   border-bottom: 2px solid #89b4fa;
-  background: rgba(255, 255, 255, 0.05); /* うっすらハイライト */
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* 🎵 メディア */
@@ -70,40 +70,92 @@ body {
 .time-chip {
   font-weight: bold;
   letter-spacing: 1px;
-  color: #cba6f7; /* 紫アクセント */
+  color: #ffffff;
   font-size: 14px;
 }
 
-.chip {
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 500;
+.section.right {
+  gap: 0;
 }
 
+/* 各種チップ：斜めデザインのベース */
+.chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #11111b;
+  z-index: 1;
+}
+
+/* アイコンの設定 */
 .chip i {
   display: flex;
   margin-right: 6px;
   font-size: 18px;
+  color: #11111b;
 }
 
-.chip.net i { color: #f38ba8; }    /* 赤 */
-.chip.audio i { color: #fab387; }  /* オレンジ */
-.chip.cpu i { color: #f9e2af; }    /* 黄色 */
-.chip.mem i { color: #89dceb; }    /* 水色 */
-.chip.bat i { color: #a6e3a1; }    /* 緑 */
+/* 平行四辺形 */
+.chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-color, #ffffff);
+  transform: skewX(-20deg);
+  /* -20度斜めに傾ける */
+  z-index: -1;
+  /* 文字の後ろに配置 */
+}
 
-/* 警告時のスタイル */
-.chip.danger {
-  color: #f38ba8;
+.chip.net {
+  --bg-color: #f38ba8;
+}
+
+/* 赤 */
+.chip.audio {
+  --bg-color: #fab387;
+}
+
+/* オレンジ */
+.chip.cpu {
+  --bg-color: #f9e2af;
+}
+
+/* 黄色 */
+.chip.mem {
+  --bg-color: #a6e3a1;
+}
+
+/* 緑 */
+.chip.bat {
+  --bg-color: #89b4fa;
+}
+
+/* 青 */
+
+/* 警告時 */
+.chip.danger::before {
+  background-color: #f38ba8;
+  /* 背景全体を赤に */
   animation: pulse 1.5s infinite;
-}
-.chip.danger i {
-  color: #f38ba8;
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
