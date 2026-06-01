@@ -29,32 +29,73 @@
     media:   { type: 'media' },
     glazewm: { type: 'glazewm' },
     date:    { type: 'date' },
-    gpu: {
-      type: 'shell',
-      command: `powershell -NoProfile -command "try{[int]((Get-Counter '\\GPU Engine(*engtype_3D*)\\Utilization Percentage' -EA Stop).CounterSamples|Measure-Object -Property CookedValue -Sum).Sum}catch{0}"`,
-      refreshInterval: 3000,
-    },
-    temp: {
-      type: 'shell',
-      command: `powershell -NoProfile -command "try{$t=(Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature -EA Stop).CurrentTemperature;if($t){[int]($t[0]/10-273.15)}else{0}}catch{0}"`,
-      refreshInterval: 10000,
-    },
-    vpn: {
-      type: 'shell',
-      command: `powershell -NoProfile -command "if((Get-NetAdapter -EA SilentlyContinue|Where-Object{$_.InterfaceDescription -match 'VPN|TAP|WireGuard|OpenVPN|Surfshark|NordVPN|ProtonVPN'}|Where-Object{$_.Status -eq 'Up'}).Count -gt 0){'on'}else{'off'}"`,
-      refreshInterval: 15000,
-    },
   });
 
   createRoot(document.getElementById('root')).render(<App />);
 
   function App() {
     const [output, setOutput] = useState(providers.outputMap);
-    const [showSec, setShowSec]     = useState(false);
-    const [commits, setCommits]     = useState(null);
+    const [showSec, setShowSec] = useState(false);
+    const [commits, setCommits] = useState(null);
+    const [gpuPct,  setGpuPct]  = useState(null);
+    const [tempC,   setTempC]   = useState(null);
+    const [vpnOn,   setVpnOn]   = useState(false);
 
     useEffect(() => {
       providers.onOutput(() => setOutput(providers.outputMap));
+    }, []);
+
+    // GPU usage via shellExec (every 3s)
+    useEffect(() => {
+      const poll = async () => {
+        try {
+          const r = await zebar.shellExec(
+            'powershell',
+            ['-NoProfile', '-command',
+             "try{[int]((Get-Counter '\\GPU Engine(*engtype_3D*)\\Utilization Percentage' -EA Stop).CounterSamples|Measure-Object -Property CookedValue -Sum).Sum}catch{0}"]
+          );
+          const v = parseInt(r.stdout?.trim());
+          setGpuPct(isNaN(v) || v === 0 ? null : Math.min(99, v));
+        } catch { setGpuPct(null); }
+      };
+      poll();
+      const id = setInterval(poll, 3000);
+      return () => clearInterval(id);
+    }, []);
+
+    // CPU temperature via shellExec (every 10s)
+    useEffect(() => {
+      const poll = async () => {
+        try {
+          const r = await zebar.shellExec(
+            'powershell',
+            ['-NoProfile', '-command',
+             "try{$t=(Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature -EA Stop).CurrentTemperature;if($t){[int]($t[0]/10-273.15)}else{0}}catch{0}"]
+          );
+          const v = parseInt(r.stdout?.trim());
+          setTempC(isNaN(v) || v <= 0 ? null : v);
+        } catch { setTempC(null); }
+      };
+      poll();
+      const id = setInterval(poll, 10000);
+      return () => clearInterval(id);
+    }, []);
+
+    // VPN detection via shellExec (every 15s)
+    useEffect(() => {
+      const poll = async () => {
+        try {
+          const r = await zebar.shellExec(
+            'powershell',
+            ['-NoProfile', '-command',
+             "if((Get-NetAdapter -EA SilentlyContinue|Where-Object{$_.InterfaceDescription -match 'VPN|TAP|WireGuard|OpenVPN|Surfshark|NordVPN|ProtonVPN'}|Where-Object{$_.Status -eq 'Up'}).Count -gt 0){'on'}else{'off'}"]
+          );
+          setVpnOn(r.stdout?.trim() === 'on');
+        } catch { setVpnOn(false); }
+      };
+      poll();
+      const id = setInterval(poll, 15000);
+      return () => clearInterval(id);
     }, []);
 
     // GitHub commit count (today, JST)
@@ -89,14 +130,6 @@
     // ── Data ───────────────────────────────────────────────
     const cpuPct = Math.round(output.cpu?.usage ?? 0);
     const memPct = Math.round(output.memory?.usage ?? 0);
-
-    const gpuRaw = output.gpu?.stdout?.trim();
-    const gpuPct = (gpuRaw && gpuRaw !== '0') ? Math.min(99, parseInt(gpuRaw) || 0) : null;
-
-    const tempRaw = output.temp?.stdout?.trim();
-    const tempC   = (tempRaw && tempRaw !== '0') ? parseInt(tempRaw) || null : null;
-
-    const vpnOn = output.vpn?.stdout?.trim() === 'on';
 
     const bat   = output.battery;
     const vol   = output.audio?.defaultPlaybackDevice;
