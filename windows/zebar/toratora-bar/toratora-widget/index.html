@@ -1,17 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" />
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" />
   <link rel="stylesheet" type="text/css" href="./styles.css" />
-
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
     integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
 </head>
@@ -26,147 +22,187 @@
 
   const providers = zebar.createProviderGroup({
     cpu:     { type: 'cpu' },
-    battery: { type: 'battery' },
     memory:  { type: 'memory' },
+    battery: { type: 'battery' },
     network: { type: 'network' },
     audio:   { type: 'audio' },
     media:   { type: 'media' },
     glazewm: { type: 'glazewm' },
     date:    { type: 'date' },
+    gpu: {
+      type: 'shell',
+      command: `powershell -NoProfile -command "try{[int]((Get-Counter '\\GPU Engine(*engtype_3D*)\\Utilization Percentage' -EA Stop).CounterSamples|Measure-Object -Property CookedValue -Sum).Sum}catch{0}"`,
+      refreshInterval: 3000,
+    },
+    temp: {
+      type: 'shell',
+      command: `powershell -NoProfile -command "try{$t=(Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature -EA Stop).CurrentTemperature;if($t){[int]($t[0]/10-273.15)}else{0}}catch{0}"`,
+      refreshInterval: 10000,
+    },
+    vpn: {
+      type: 'shell',
+      command: `powershell -NoProfile -command "if((Get-NetAdapter -EA SilentlyContinue|Where-Object{$_.InterfaceDescription -match 'VPN|TAP|WireGuard|OpenVPN|Surfshark|NordVPN|ProtonVPN'}|Where-Object{$_.Status -eq 'Up'}).Count -gt 0){'on'}else{'off'}"`,
+      refreshInterval: 15000,
+    },
   });
 
   createRoot(document.getElementById('root')).render(<App />);
 
   function App() {
     const [output, setOutput] = useState(providers.outputMap);
+    const [showSec, setShowSec]     = useState(false);
+    const [commits, setCommits]     = useState(null);
 
     useEffect(() => {
       providers.onOutput(() => setOutput(providers.outputMap));
     }, []);
 
+    // GitHub commit count (today, JST)
+    useEffect(() => {
+      const fetchCommits = async () => {
+        try {
+          const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
+          const res = await fetch('https://api.github.com/users/ToraMutton/events?per_page=100');
+          if (!res.ok) return;
+          const events = await res.json();
+          const count = events
+            .filter(e => e.type === 'PushEvent' && (e.created_at ?? '').startsWith(today))
+            .reduce((sum, e) => sum + (e.payload?.commits?.length ?? 0), 0);
+          setCommits(count);
+        } catch { /* rate-limited or offline */ }
+      };
+      fetchCommits();
+      const id = setInterval(fetchCommits, 5 * 60 * 1000);
+      return () => clearInterval(id);
+    }, []);
+
+    // ── Time ───────────────────────────────────────────────
     const now = new Date();
-    const timeStr = new Intl.DateTimeFormat('ja-JP', {
-      hour: '2-digit', minute: '2-digit', hour12: false,
-    }).format(now);
-    const dateStr = new Intl.DateTimeFormat('ja-JP', {
-      month: 'short', day: 'numeric', weekday: 'short',
-    }).format(now);
+    const DAY_JP = ['日','月','火','水','木','金','土'];
+    const dayK = DAY_JP[now.getDay()];
+    const mo   = String(now.getMonth() + 1).padStart(2, '0');
+    const dy   = String(now.getDate()).padStart(2, '0');
+    const hh   = String(now.getHours()).padStart(2, '0');
+    const mm   = String(now.getMinutes()).padStart(2, '0');
+    const ss   = String(now.getSeconds()).padStart(2, '0');
 
-    const focusedContainer = output.glazewm?.focusedContainer;
-    const windowTitle = focusedContainer?.title ?? null;
+    // ── Data ───────────────────────────────────────────────
+    const cpuPct = Math.round(output.cpu?.usage ?? 0);
+    const memPct = Math.round(output.memory?.usage ?? 0);
 
-    function BatteryIcon({ percent, isCharging }) {
-      if (isCharging)   return <span className="ms-icon">bolt</span>;
-      if (percent > 90) return <span className="ms-icon">battery_full</span>;
-      if (percent > 60) return <span className="ms-icon">battery_5_bar</span>;
-      if (percent > 30) return <span className="ms-icon">battery_3_bar</span>;
-      if (percent > 10) return <span className="ms-icon">battery_1_bar</span>;
-      return <span className="ms-icon">battery_0_bar</span>;
-    }
+    const gpuRaw = output.gpu?.stdout?.trim();
+    const gpuPct = (gpuRaw && gpuRaw !== '0') ? Math.min(99, parseInt(gpuRaw) || 0) : null;
 
-    function VolumeIcon({ volume, isMuted }) {
-      if (isMuted || volume === 0) return <span className="ms-icon">volume_off</span>;
-      if (volume < 33)             return <span className="ms-icon">volume_mute</span>;
-      if (volume < 66)             return <span className="ms-icon">volume_down</span>;
-      return <span className="ms-icon">volume_up</span>;
-    }
+    const tempRaw = output.temp?.stdout?.trim();
+    const tempC   = (tempRaw && tempRaw !== '0') ? parseInt(tempRaw) || null : null;
 
-    function NetworkIcon({ type, signalStrength }) {
-      if (type === 'wifi') {
-        const s = signalStrength ?? 100;
-        if (s > 66) return <span className="ms-icon">wifi</span>;
-        if (s > 33) return <span className="ms-icon">wifi_2_bar</span>;
-        return <span className="ms-icon">wifi_1_bar</span>;
-      }
-      return <span className="ms-icon">lan</span>;
-    }
+    const vpnOn = output.vpn?.stdout?.trim() === 'on';
+
+    const bat   = output.battery;
+    const vol   = output.audio?.defaultPlaybackDevice;
+    const net   = output.network?.defaultInterface;
+    const media = output.media?.currentSession;
+    const wsList = output.glazewm?.currentWorkspaces ?? [];
+    const focusedTitle = output.glazewm?.focusedContainer?.title ?? null;
+
+    // Fixed-width 2-digit (figure-space pad)
+    const n2 = v => String(Math.min(99, Math.max(0, Math.round(v)))).padStart(2, ' ');
+    const n3 = v => String(Math.min(999, Math.max(0, Math.round(v)))).padStart(3, ' ');
+
+    // Signal strength → 4 block chars
+    const sigBars = s => {
+      const filled = Math.round(Math.min(100, Math.max(0, s ?? 0)) / 25);
+      return '▇'.repeat(filled) + '░'.repeat(4 - filled);
+    };
 
     return (
       <div id="app">
 
-        {/* 左側：ワークスペース + アクティブウィンドウタイトル */}
+        {/* ── LEFT: workspaces + window title ── */}
         <div className="section left">
           <div className="workspaces">
-            {output.glazewm?.currentWorkspaces.map(ws => (
-              <div key={ws.name} className={`ws-pill ${ws.hasFocus ? 'active' : ''}`}>
-                {ws.displayName ?? ws.name}
-              </div>
+            {wsList.map(ws => (
+              <span key={ws.name} className={ws.hasFocus ? 'ws-on' : 'ws-off'}>
+                {ws.hasFocus ? `[${ws.displayName ?? ws.name}]` : (ws.displayName ?? ws.name)}
+              </span>
             ))}
           </div>
-          {windowTitle && <div className="divider" />}
-          {windowTitle && (
-            <div className="window-title">{windowTitle}</div>
+          {focusedTitle && (
+            <>
+              <span className="sep-arrow"> › </span>
+              <span className="win-title">
+                {focusedTitle.length > 38 ? focusedTitle.slice(0, 38) + '…' : focusedTitle}
+              </span>
+            </>
           )}
         </div>
 
-        {/* 中央：時計 */}
+        {/* ── CENTER: clock ── */}
         <div className="section center">
-          <div className="clock">
-            <span className="clock-date">{dateStr}</span>
-            <span className="clock-sep" />
-            <span className="ms-icon clock-icon">schedule</span>
-            <span className="clock-time">{timeStr}</span>
-          </div>
+          <span className="c-day">({dayK})</span>
+          <span className="c-date">{mo}.{dy}</span>
+          <span className="c-sep"> · </span>
+          <span className="c-time" onClick={() => setShowSec(v => !v)} title="クリックで秒表示切替">
+            {hh}<span className="c-colon">:</span>{mm}
+            {showSec && <><span className="c-colon">:</span><span className="c-sec">{ss}</span></>}
+          </span>
         </div>
 
-        {/* 右側：ステータスチップ */}
+        {/* ── RIGHT: stats ── */}
         <div className="section right">
 
-          {output.media?.currentSession && (
-            <div className="chip media">
-              <span className="ms-icon">music_note</span>
-              <span className="chip-label">
-                {output.media.currentSession.title.substring(0, 16)}
-                {output.media.currentSession.title.length > 16 ? '…' : ''}
+          <span className="stat cpu">CPU:<span className="val">{n2(cpuPct)}</span></span>
+          <span className="stat mem">MEM:<span className="val">{n2(memPct)}</span></span>
+          {gpuPct !== null && <span className="stat gpu">GPU:<span className="val">{n2(gpuPct)}</span></span>}
+          {tempC  !== null && <span className="stat temp"><span className="val-bare">{tempC}</span>°</span>}
+
+          <span className="dot">·</span>
+
+          {net && (
+            <span className={`stat net${net.type === 'disconnected' ? ' net-dead' : ''}`}>
+              <span className="sig">{sigBars(net.signalStrength)}</span>
+              {' '}
+              <span className="net-name">
+                {net.type === 'wifi'
+                  ? (net.ssid || 'WiFi')
+                  : net.type === 'ethernet'
+                  ? 'LAN'
+                  : net.type === 'disconnected'
+                  ? '──'
+                  : net.type}
               </span>
-            </div>
+            </span>
           )}
 
-          {output.network?.defaultInterface && (
-            <div className="chip net">
-              <NetworkIcon
-                type={output.network.defaultInterface.type}
-                signalStrength={output.network.defaultInterface.signalStrength}
-              />
-              {output.network.defaultInterface.type === 'wifi' && output.network.defaultInterface.ssid && (
-                <span className="chip-label">
-                  {output.network.defaultInterface.ssid.substring(0, 10)}
-                </span>
-              )}
-            </div>
+          <span className="dot">·</span>
+
+          {vol && (
+            <span className="stat vol">
+              {vol.isMuted
+                ? <span className="muted">VOL:──</span>
+                : <>VOL:<span className="val">{n2(Math.round(vol.volume))}</span></>
+              }
+            </span>
           )}
 
-          {output.audio?.defaultPlaybackDevice && (
-            <div className="chip audio">
-              <VolumeIcon
-                volume={output.audio.defaultPlaybackDevice.volume}
-                isMuted={output.audio.defaultPlaybackDevice.isMuted}
-              />
-              <span className="chip-label">
-                {Math.round(output.audio.defaultPlaybackDevice.volume)}%
-              </span>
-            </div>
+          {bat && (
+            <span className={`stat bat${bat.chargePercent < 15 && !bat.isCharging ? ' bat-crit' : ''}`}>
+              {bat.isCharging ? '⚡' : '▲'}<span className="val-bat">{n3(bat.chargePercent)}</span><span className="pct-sign">%</span>
+            </span>
           )}
 
-          <div className={`chip cpu ${(output.cpu?.usage ?? 0) > 80 ? 'danger' : ''}`}>
-            <span className="ms-icon">memory</span>
-            <span className="chip-label">{Math.round(output.cpu?.usage ?? 0)}%</span>
-          </div>
+          <span className="dot">·</span>
 
-          <div className={`chip mem ${(output.memory?.usage ?? 0) > 80 ? 'danger' : ''}`}>
-            <span className="ms-icon">database</span>
-            <span className="chip-label">{Math.round(output.memory?.usage ?? 0)}%</span>
-          </div>
-
-          {output.battery && (
-            <div className={`chip bat ${output.battery.chargePercent < 20 && !output.battery.isCharging ? 'danger' : ''}`}>
-              <BatteryIcon
-                percent={output.battery.chargePercent}
-                isCharging={output.battery.isCharging}
-              />
-              <span className="chip-label">{Math.round(output.battery.chargePercent)}%</span>
-            </div>
+          {media?.title && (
+            <span className="stat music">
+              ♫{' '}
+              {media.title.length > 20 ? media.title.slice(0, 20) + '…' : media.title}
+            </span>
           )}
+
+          {vpnOn && <span className="stat vpn">[VPN]</span>}
+
+          {commits !== null && <span className="stat commits">↑{commits}</span>}
 
         </div>
       </div>
