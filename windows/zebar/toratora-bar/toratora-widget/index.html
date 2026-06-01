@@ -5,12 +5,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Custom styles. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" />
+
   <link rel="stylesheet" type="text/css" href="./styles.css" />
 
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-  <!-- Allows React to be run buildless via "text/babel" script below. -->
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
     integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo=" crossorigin="anonymous"></script>
 </head>
@@ -24,15 +25,14 @@
   import * as zebar from 'https://esm.sh/zebar@3.0';
 
   const providers = zebar.createProviderGroup({
-    cpu: { type: 'cpu' },
+    cpu:     { type: 'cpu' },
     battery: { type: 'battery' },
-    memory: { type: 'memory' },
-    // weather: { type: 'weather' },
+    memory:  { type: 'memory' },
     network: { type: 'network' },
-    audio: { type: 'audio' },
-    media: { type: 'media' },
+    audio:   { type: 'audio' },
+    media:   { type: 'media' },
     glazewm: { type: 'glazewm' },
-    date: { type: 'date' }, // 時計
+    date:    { type: 'date' },
   });
 
   createRoot(document.getElementById('root')).render(<App />);
@@ -44,75 +44,135 @@
       providers.onOutput(() => setOutput(providers.outputMap));
     }, []);
 
+    const now = new Date();
+    const timeStr = new Intl.DateTimeFormat('ja-JP', {
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    }).format(now);
+    const dateStr = new Intl.DateTimeFormat('ja-JP', {
+      month: 'short', day: 'numeric', weekday: 'short',
+    }).format(now);
+
+    const focusedContainer = output.glazewm?.focusedContainer;
+    const windowTitle = focusedContainer?.title ?? null;
+
+    function BatteryIcon({ percent, isCharging }) {
+      if (isCharging)   return <span className="ms-icon">bolt</span>;
+      if (percent > 90) return <span className="ms-icon">battery_full</span>;
+      if (percent > 60) return <span className="ms-icon">battery_5_bar</span>;
+      if (percent > 30) return <span className="ms-icon">battery_3_bar</span>;
+      if (percent > 10) return <span className="ms-icon">battery_1_bar</span>;
+      return <span className="ms-icon">battery_0_bar</span>;
+    }
+
+    function VolumeIcon({ volume, isMuted }) {
+      if (isMuted || volume === 0) return <span className="ms-icon">volume_off</span>;
+      if (volume < 33)             return <span className="ms-icon">volume_mute</span>;
+      if (volume < 66)             return <span className="ms-icon">volume_down</span>;
+      return <span className="ms-icon">volume_up</span>;
+    }
+
+    function NetworkIcon({ type, signalStrength }) {
+      if (type === 'wifi') {
+        const s = signalStrength ?? 100;
+        if (s > 66) return <span className="ms-icon">wifi</span>;
+        if (s > 33) return <span className="ms-icon">wifi_2_bar</span>;
+        return <span className="ms-icon">wifi_1_bar</span>;
+      }
+      return <span className="ms-icon">lan</span>;
+    }
+
     return (
       <div id="app">
-        {/* 左側：ワークスペースとメディア */}
+
+        {/* 左側：ワークスペース + アクティブウィンドウタイトル */}
         <div className="section left">
           <div className="workspaces">
             {output.glazewm?.currentWorkspaces.map(ws => (
-              <div key={ws.name} className={`ws-dot ${ws.hasFocus ? 'active' : ''}`}>
+              <div key={ws.name} className={`ws-pill ${ws.hasFocus ? 'active' : ''}`}>
                 {ws.displayName ?? ws.name}
               </div>
             ))}
           </div>
-          {output.media?.currentSession && (
-            <div className="chip media">
-              🎵 {output.media.currentSession.title.substring(0, 20)}...
-            </div>
+          {windowTitle && <div className="divider" />}
+          {windowTitle && (
+            <div className="window-title">{windowTitle}</div>
           )}
         </div>
 
         {/* 中央：時計 */}
         <div className="section center">
-          <div className="time-chip">
-            {new Intl.DateTimeFormat('ja-JP', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            }).format(new Date())}
+          <div className="clock">
+            <span className="clock-date">{dateStr}</span>
+            <span className="clock-sep" />
+            <span className="ms-icon clock-icon">schedule</span>
+            <span className="clock-time">{timeStr}</span>
           </div>
         </div>
 
-        {/* 右側：システムステータス */}
+        {/* 右側：ステータスチップ */}
         <div className="section right">
-        
-          {/* ネットワーク (Wi-FiならSSID、それ以外なら接続タイプを表示) */}
+
+          {output.media?.currentSession && (
+            <div className="chip media">
+              <span className="ms-icon">music_note</span>
+              <span className="chip-label">
+                {output.media.currentSession.title.substring(0, 16)}
+                {output.media.currentSession.title.length > 16 ? '…' : ''}
+              </span>
+            </div>
+          )}
+
           {output.network?.defaultInterface && (
             <div className="chip net">
-              {output.network.defaultInterface.type === 'wifi' ? (
-                <><i className="ph ph-wifi-high"></i> {output.network.defaultInterface.ssid}</>
-              ) : (
-                <><i className="ph ph-plugs-connected"></i> {output.network.defaultInterface.type}</>
+              <NetworkIcon
+                type={output.network.defaultInterface.type}
+                signalStrength={output.network.defaultInterface.signalStrength}
+              />
+              {output.network.defaultInterface.type === 'wifi' && output.network.defaultInterface.ssid && (
+                <span className="chip-label">
+                  {output.network.defaultInterface.ssid.substring(0, 10)}
+                </span>
               )}
             </div>
           )}
 
-          {/* オーディオ (音量) */}
           {output.audio?.defaultPlaybackDevice && (
             <div className="chip audio">
-              <i className="ph ph-speaker-high"></i> {Math.round(output.audio.defaultPlaybackDevice.volume)}%
+              <VolumeIcon
+                volume={output.audio.defaultPlaybackDevice.volume}
+                isMuted={output.audio.defaultPlaybackDevice.isMuted}
+              />
+              <span className="chip-label">
+                {Math.round(output.audio.defaultPlaybackDevice.volume)}%
+              </span>
             </div>
           )}
 
-          <div className="chip cpu">
-            <i className="ph ph-cpu"></i> {Math.round(output.cpu?.usage)}%
+          <div className={`chip cpu ${(output.cpu?.usage ?? 0) > 80 ? 'danger' : ''}`}>
+            <span className="ms-icon">memory</span>
+            <span className="chip-label">{Math.round(output.cpu?.usage ?? 0)}%</span>
           </div>
 
-          <div className= {`chip mem ${output.memory?.usage > 80 ? 'danger' : ''}`}>
-            <i className="ph ph-memory"></i> {Math.round(output.memory?.usage)}%
+          <div className={`chip mem ${(output.memory?.usage ?? 0) > 80 ? 'danger' : ''}`}>
+            <span className="ms-icon">database</span>
+            <span className="chip-label">{Math.round(output.memory?.usage ?? 0)}%</span>
           </div>
 
-          <div className={`chip bat ${output.battery?.chargePercent < 20 ? 'danger' : ''}`}>
-            <i className="ph ph-battery-full"></i> {Math.round(output.battery?.chargePercent)}%
-          </div>
+          {output.battery && (
+            <div className={`chip bat ${output.battery.chargePercent < 20 && !output.battery.isCharging ? 'danger' : ''}`}>
+              <BatteryIcon
+                percent={output.battery.chargePercent}
+                isCharging={output.battery.isCharging}
+              />
+              <span className="chip-label">{Math.round(output.battery.chargePercent)}%</span>
+            </div>
+          )}
+
         </div>
       </div>
     );
   }
-</script>
+  </script>
 </body>
 
 </html>
