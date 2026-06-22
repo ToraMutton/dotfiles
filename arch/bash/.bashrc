@@ -47,3 +47,10 @@ fi
 if grep -qi "microsoft" /proc/version 2>/dev/null; then
     export PATH="$PATH:/mnt/c/Users/$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')/AppData/Local/Programs/Zed/bin"
 fi
+
+# dotfiles自動同期
+
+if grep -qi "microsoft" /proc/version 2>/dev/null; then
+    (cd ~/dotfiles && git pull --quiet 2>/dev/null &)
+    (cd /mnt/c/Users/Mylot/dotfiles && git pull --quiet 2>/dev/null &)
+fi
