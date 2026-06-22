@@ -1,30 +1,50 @@
 [
-  {
-    "context": "Editor && VimControl && !VimWaiting && !menu",
-    "bindings": {
-      "space space": "file_finder::Toggle",
-      "space e": "project_panel::ToggleFocus",
-      "space g": "git_panel::ToggleFocus",
-      "space t": "terminal_panel::ToggleFocus",
-      "space b d": "pane::CloseActiveItem",
-      "g d": "editor::GoToDefinition",
-      "g r": "editor::FindAllReferences",
-      "g h": "editor::Hover",
-      "space c a": "editor::ToggleCodeActions",
-      "space c r": "editor::Rename",
-      "ctrl-s": "workspace::Save"
+    {
+        "context": "Editor && VimControl && !VimWaiting && !menu",
+        "bindings": {
+            "space space": "file_finder::Toggle",
+            "space e": "project_panel::ToggleFocus",
+            "space g": "git_panel::ToggleFocus",
+            "space t": "terminal_panel::ToggleFocus",
+            "space c d": "diagnostics::Deploy",
+            "g d": "editor::GoToDefinition",
+            "g D": "editor::GoToTypeDefinition",
+            "g r": "editor::FindAllReferences",
+            "g h": "editor::Hover",
+            "space c a": "editor::ToggleCodeActions",
+            "space c r": "editor::Rename",
+            "space f": "editor::Format",
+            "space w v": "pane::SplitRight",
+            "space w s": "pane::SplitDown",
+            "space b d": "pane::CloseActiveItem",
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-j": "workspace::ActivatePaneDown",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-s": "workspace::Save"
+        }
+    },
+    {
+        "context": "Editor && vim_mode == insert",
+        "bindings": {
+            "ctrl-s": "workspace::Save",
+            "j k": "vim::NormalBefore"
+        }
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-`": "terminal_panel::ToggleFocus"
+        }
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-`": "terminal_panel::ToggleFocus",
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-j": "workspace::ActivatePaneDown",
+            "ctrl-k": "workspace::ActivatePaneUp"
+        }
     }
-  },
-  {
-    "context": "Editor && vim_mode == insert",
-    "bindings": {
-      "ctrl-s": "workspace::Save"
-    }
-  },
-  {
-    "context": "Workspace",
-    "bindings": {
-      "ctrl-`": "terminal_panel::ToggleFocus"
-    }
-  }
 ]
