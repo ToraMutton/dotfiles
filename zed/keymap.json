@@ -28,7 +28,7 @@
         "context": "Editor && vim_mode == insert",
         "bindings": {
             "ctrl-s": "workspace::Save",
-            "j k": "vim::NormalBefore"
+            "jk": "vim::NormalBefore"
         }
     },
     {
