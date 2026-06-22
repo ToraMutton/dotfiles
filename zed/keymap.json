@@ -1,23 +1,22 @@
-
 [
-  {
-    "context": "Editor && VimControl && !VimWaiting && !menu",
-    "bindings": {
-      "space space": "file_finder::Toggle",
-      "space e": "project_panel::ToggleFocus",
-      "space t": "terminal_panel::ToggleFocus",
-      "space b d": "pane::CloseActiveItem",
-      "g d": "editor::GoToDefinition",
-      "g r": "editor::FindAllReferences",
-      "g h": "editor::Hover",
-      "space c a": "editor::ToggleCodeActions",
-      "space c r": "editor::Rename"
+    {
+        "context": "Editor && VimControl && !VimWaiting && !menu",
+        "bindings": {
+            "space space": "file_finder::Toggle",
+            "space e": "project_panel::ToggleFocus",
+            "space t": "terminal_panel::ToggleFocus",
+            "space b d": "pane::CloseActiveItem",
+            "g d": "editor::GoToDefinition",
+            "g r": "editor::FindAllReferences",
+            "g h": "editor::Hover",
+            "space c a": "editor::ToggleCodeActions",
+            "space c r": "editor::Rename"
+        }
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-`": "terminal_panel::ToggleFocus"
+        }
     }
-  },
-  {
-    "context": "Workspace",
-    "bindings": {
-      "ctrl-`": "terminal_panel::ToggleFocus"
-    }
-  }
 ]
