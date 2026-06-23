@@ -52,7 +52,6 @@ fi
 
 if grep -qi "microsoft" /proc/version 2>/dev/null; then
     (cd ~/dotfiles && git pull --quiet 2>/dev/null &)
-    (cd /mnt/c/Users/Mylot/dotfiles && git pull --quiet 2>/dev/null &)
 fi
 
 export PATH="$PATH:/mnt/c/Users/Mylot/AppData/Local/Programs/Zed/bin"
