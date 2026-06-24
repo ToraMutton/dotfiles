@@ -12,31 +12,29 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 # ===== UEC Server SSHFS Settings =====
 
-# sol接続用コマンド
-sol() {
-    # まだマウントされていなければマウントする
-    if ! mountpoint -q ~/uec_sol; then
-        echo "solに接続中..."
-        sshfs uec-sol: ~/uec_sol
+_uec_mount() {
+    local name="$1"
+    local host="$2"
+    local dir="$HOME/uec_$name"
+    mkdir -p "$dir"
+    if ! mountpoint -q "$dir"; then
+        echo "${name}に接続中..."
+        sshfs "$host": "$dir" || { echo "接続失敗"; return 1; }
     fi
-    cd ~/uec_sol
+    cd "$dir"
 }
 
-# ced接続用コマンド
-ced() {
-    if ! mountpoint -q ~/uec_ced; then
-        echo "cedに接続中..."
-        sshfs ced-orange: ~/uec_ced
-    fi
-    cd ~/uec_ced
-}
+sol() { _uec_mount sol uec-sol; }
+ced() { _uec_mount ced ced-orange; }
+ied() { _uec_mount ied ied; }
 
-# 手動切断用エイリアス（ホームに戻ってから切断しないとエラーになるため）
+# 手動切断
 alias unsol="cd ~ && fusermount3 -u ~/uec_sol && echo 'solを切断しました'"
 alias unced="cd ~ && fusermount3 -u ~/uec_ced && echo 'cedを切断しました'"
+alias unied="cd ~ && fusermount3 -u ~/uec_ied && echo 'iedを切断しました'"
 
-# ウィンドウを閉じた時の自動片付け（エラー出力は /dev/null に捨てて無視）
-trap 'fusermount3 -u ~/uec_sol 2>/dev/null; fusermount3 -u ~/uec_ced 2>/dev/null' EXIT
+# ウィンドウを閉じた時の自動片付け
+trap 'fusermount3 -u ~/uec_sol 2>/dev/null; fusermount3 -u ~/uec_ced 2>/dev/null; fusermount3 -u ~/uec_ied 2>/dev/null' EXIT
 
 # WSL2起動時、Windowsパスにいたらホームに移動
 if [[ "$(pwd)" == /mnt/* ]]; then
@@ -45,7 +43,7 @@ fi
 
 # WSL2: Zed CLIへのパスを通す（appendWindowsPath=falseの補完）
 if grep -qi "microsoft" /proc/version 2>/dev/null; then
-    export PATH="$PATH:/mnt/c/Users/$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')/AppData/Local/Programs/Zed/bin"
+    export PATH="$PATH:/mnt/c/Users/Mylot/AppData/Local/Programs/Zed/bin"
 fi
 
 # dotfiles自動同期
@@ -54,4 +52,4 @@ if grep -qi "microsoft" /proc/version 2>/dev/null; then
     (cd ~/dotfiles && git pull --quiet 2>/dev/null &)
 fi
 
-export PATH="$PATH:/mnt/c/Users/Mylot/AppData/Local/Programs/Zed/bin"
+alias zenn-preview='npx zenn preview --host 0.0.0.0'
