@@ -72,3 +72,4 @@ fi
 
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
 alias zed='zeditor'
+export PATH=$PATH:/opt/rocm/bin
