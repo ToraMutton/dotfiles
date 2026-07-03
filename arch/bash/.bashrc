@@ -33,8 +33,23 @@ alias unsol="cd ~ && fusermount3 -u ~/uec_sol && echo 'solを切断しました'
 alias unced="cd ~ && fusermount3 -u ~/uec_ced && echo 'cedを切断しました'"
 alias unied="cd ~ && fusermount3 -u ~/uec_ied && echo 'iedを切断しました'"
 
+# dotfiles自動保存（シェル終了時）
+_dotfiles_autosave() {
+    cd ~/dotfiles
+    if [[ -n $(git status --porcelain) ]]; then
+        git add -A
+        git commit -m "auto: sync $(date '+%Y-%m-%d %H:%M')" --quiet
+        git push --quiet
+    fi
+}
+
 # ウィンドウを閉じた時の自動片付け
-trap 'fusermount3 -u ~/uec_sol 2>/dev/null; fusermount3 -u ~/uec_ced 2>/dev/null; fusermount3 -u ~/uec_ied 2>/dev/null' EXIT
+trap '
+    fusermount3 -u ~/uec_sol 2>/dev/null
+    fusermount3 -u ~/uec_ced 2>/dev/null
+    fusermount3 -u ~/uec_ied 2>/dev/null
+    _dotfiles_autosave
+' EXIT
 
 # WSL2起動時、Windowsパスにいたらホームに移動
 if [[ "$(pwd)" == /mnt/* ]]; then
