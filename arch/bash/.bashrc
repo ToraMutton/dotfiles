@@ -39,6 +39,9 @@ _dotfiles_autosave() {
     if [[ -n $(git status --porcelain) ]]; then
         git add -A
         git commit -m "auto: sync $(date '+%Y-%m-%d %H:%M')" --quiet
+    fi
+    # commitの有無に関わらず、pushし忘れがあれば拾う
+    if [[ -n $(git log origin/main..HEAD 2>/dev/null) ]]; then
         git push --quiet
     fi
 }
