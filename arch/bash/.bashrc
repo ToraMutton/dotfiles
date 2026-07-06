@@ -71,5 +71,5 @@ if grep -qi "microsoft" /proc/version 2>/dev/null; then
 fi
 
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
-alias zed='zeditor'
+alias zed="/mnt/c/Users/WINDOWS_USER/AppData/Local/Programs/Zed/Zed.exe"
 export PATH=$PATH:/opt/rocm/bin
