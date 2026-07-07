@@ -1,0 +1,28 @@
+{
+    "vim_mode": true,
+    "ui_font_size": 16,
+    "buffer_font_size": 14,
+    "theme": "One Dark",
+    "tab_size": 4,
+    "format_on_save": "on",
+    "autosave": "on_focus_change",
+    "relative_line_numbers": "disabled",
+    "cli_default_open_behavior": "existing_window",
+    "languages": {
+        "TypeScript": { "tab_size": 2 },
+        "JavaScript": { "tab_size": 2 },
+        "C": { "tab_size": 4 },
+        "Rust": { "tab_size": 4 }
+    },
+    "lsp": {
+        "texlab": {
+            "settings": {
+                "texlab": {
+                    "build": {
+                        "onSave": true
+                    }
+                }
+            }
+        }
+    }
+}
