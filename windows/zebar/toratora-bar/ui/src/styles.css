@@ -1,0 +1,317 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* Tokyo Night Storm */
+  --bg:      #1a1b26;
+  --bg1:     #24283b;
+  --fg:      #c0caf5;
+  --dim:     #565f89;
+  --border:  rgba(86, 95, 137, 0.25);
+  --blue:    #7aa2f7;
+  --cyan:    #7dcfff;
+  --purple:  #bb9af7;
+  --green:   #9ece6a;
+  --yellow:  #e0af68;
+  --orange:  #ff9e64;
+  --red:     #f7768e;
+}
+
+body {
+  background: transparent;
+  overflow: hidden;
+  color: var(--fg);
+  font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* ── App shell ───────────────────────────────────── */
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100vh;
+  padding: 0 14px;
+  background: rgba(26, 27, 38, 0.94);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  animation: bar-in 0.35s ease-out;
+}
+
+@keyframes bar-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ── Sections ────────────────────────────────────── */
+
+.section { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.section.left  { flex: 1; overflow: hidden; }
+.section.center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 3px;
+  flex-shrink: 0;
+  align-items: baseline;
+  pointer-events: none;
+}
+.section.right { flex: 1; justify-content: flex-end; gap: 6px; flex-shrink: 0; overflow: hidden; }
+
+/* ── Workspaces ──────────────────────────────────── */
+
+.workspaces { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+
+.ws {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  transition: color 0.2s, background 0.25s, transform 0.2s;
+}
+
+.ws-on {
+  color: var(--bg);
+  background: var(--blue);
+  font-weight: 700;
+  transform: translateY(0);
+  animation: ws-pop 0.22s ease-out;
+}
+
+@keyframes ws-pop {
+  0%   { transform: scale(0.85); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.ws-off { color: var(--dim); }
+.ws-off:hover { color: var(--fg); background: var(--bg1); cursor: default; }
+
+/* ── Window title ────────────────────────────────── */
+
+.sep-arrow { color: var(--dim); font-size: 11px; flex-shrink: 0; }
+
+.win-title {
+  font-size: 11px;
+  color: var(--fg);
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: fade-slide 0.25s ease-out;
+}
+
+@keyframes fade-slide {
+  from { opacity: 0; transform: translateX(4px); }
+  to   { opacity: 0.6; transform: translateX(0); }
+}
+
+/* ── Center: Clock ───────────────────────────────── */
+
+.c-day  { font-size: 10.5px; color: var(--dim); pointer-events: auto; }
+.c-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.3px;
+  pointer-events: auto;
+}
+.c-sep { color: var(--border); font-size: 10px; }
+
+.c-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 1px;
+  cursor: pointer;
+  user-select: none;
+  pointer-events: auto;
+  transition: color 0.2s;
+}
+.c-time:hover { color: var(--cyan); }
+
+/* Colon is remounted every second (key=sec) → blink restarts in phase */
+.c-colon {
+  color: var(--dim);
+  animation: blink-once 1s step-end;
+}
+@keyframes blink-once {
+  0%, 49%  { opacity: 1; }
+  50%, 99% { opacity: 0.15; }
+  100%     { opacity: 1; }
+}
+
+.c-sec { font-size: 10px; font-weight: 400; color: var(--dim); letter-spacing: 0.5px; }
+
+/* ── Right: common stat ──────────────────────────── */
+
+.stat {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.val      { display: inline-block; min-width: 2ch; text-align: right; }
+.val-bare { display: inline-block; min-width: 2ch; text-align: right; }
+.pct-sign { font-size: 9px; color: var(--dim); }
+.dot { color: var(--border); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+
+/* ── Per-stat colors ─────────────────────────────── */
+
+.cpu  { color: var(--red); }
+.mem  { color: var(--purple); }
+.gpu  { color: var(--yellow); }
+.temp { color: var(--orange); font-size: 11px; }
+
+/* ── Network ─────────────────────────────────────── */
+
+.net {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+.net:hover { background: var(--bg1); }
+
+/* signal strength color-coding */
+.sig-good { color: var(--green); }
+.sig-mid  { color: var(--yellow); }
+.sig-bad  { color: var(--red); }
+.sig-none { color: var(--dim); animation: flicker 0.9s ease-in-out infinite; }
+
+.sig {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -2px;
+  font-size: 10px;
+  display: inline-block;
+}
+
+.net-name {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.net-speed { color: var(--cyan); font-size: 10px; }
+.net-speed .arrow { color: var(--dim); font-size: 9px; }
+
+/* hover expansion: the 36px window can't show a popup, so details slide inline */
+.net-detail {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  color: var(--dim);
+  font-size: 10px;
+  transition: max-width 0.3s ease, opacity 0.25s ease;
+}
+.net-detail.open { max-width: 260px; opacity: 1; }
+
+/* ── Volume / music / misc ───────────────────────── */
+
+.vol   { color: var(--dim); }
+.muted { color: var(--dim); font-style: italic; }
+
+.music {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 11px;
+  color: var(--orange);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: fade-slide 0.3s ease-out forwards;
+}
+
+.vpn     { color: var(--green); letter-spacing: 0.5px; }
+.commits { color: var(--green); }
+
+/* ── Battery gauge ───────────────────────────────── */
+
+.bat-wrap { display: inline-flex; align-items: center; gap: 5px; }
+
+.bat-gauge {
+  position: relative;
+  width: 30px;
+  height: 9px;
+  border: 1px solid var(--dim);
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(86, 95, 137, 0.15);
+}
+/* battery nub */
+.bat-gauge::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 2px;
+  width: 2px;
+  height: 3px;
+  background: var(--dim);
+}
+
+.bat-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px 0 0 2px;
+  transition: width 0.6s ease, background 0.6s ease;
+}
+
+/* charging: light sweeps across the fill */
+.bat-fill.charging {
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 70%
+  ) !important;
+  background-color: var(--green) !important;
+  background-size: 200% 100%;
+  animation: charge-sweep 1.6s linear infinite;
+}
+@keyframes charge-sweep {
+  from { background-position: 180% 0; }
+  to   { background-position: -80% 0; }
+}
+
+.bat-bolt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.7));
+}
+
+.bat-num { font-size: 11px; transition: color 0.6s; }
+
+.bat-crit .bat-gauge { border-color: var(--red); animation: blink-soft 1s ease-in-out infinite; }
+
+@keyframes blink-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  40%      { opacity: 0.1; }
+  60%      { opacity: 0.7; }
+}
