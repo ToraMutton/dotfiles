@@ -127,3 +127,4 @@ stow mimeapps
 - **waybar**: Status bar styles & config
 - **wlogout**: Logout menu configuration
 - **mimeapps**: Default applications config
+# test
