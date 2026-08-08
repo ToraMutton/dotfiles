@@ -59,14 +59,6 @@ hl.curve("easeOutQuint", {
     },
 })
 
-hl.curve("easeInOutCubic", {
-    type = "bezier",
-    points = {
-        { 0.65, 0.05 },
-        { 0.36, 1 },
-    },
-})
-
 hl.curve("linear", {
     type = "bezier",
     points = {
@@ -166,6 +158,7 @@ hl.animation({
     speed = 4,
     spring = "windowMoveSpring",
 })
+
 hl.animation({
     leaf = "fadeIn",
     enabled = true,
@@ -232,22 +225,6 @@ hl.animation({
     style = "slidefade 20%",
 })
 
--- hl.animation({
---     leaf = "workspacesIn",
---     enabled = true,
---     speed = 1.21,
---     bezier = "almostLinear",
---     style = "fade",
--- })
-
--- hl.animation({
---     leaf = "workspacesOut",
---     enabled = true,
---     speed = 1.94,
---     bezier = "almostLinear",
---     style = "fade",
--- })
-
 hl.animation({
     leaf = "zoomFactor",
     enabled = true,
@@ -256,16 +233,12 @@ hl.animation({
 })
 
 -- =============================================================================
--- Layout
+-- Layout / miscellaneous
 -- =============================================================================
 
 hl.config({
     dwindle = {
         preserve_split = true,
-    },
-
-    master = {
-        new_status = "master",
     },
 
     misc = {
