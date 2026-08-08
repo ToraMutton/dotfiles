@@ -1,5 +1,9 @@
 -- Appearance configuration
 
+-- =============================================================================
+-- General appearance
+-- =============================================================================
+
 hl.config({
     general = {
         gaps_in = 5,
@@ -51,6 +55,8 @@ hl.config({
 -- Animation curves
 -- =============================================================================
 
+-- General-purpose Bezier curves
+
 hl.curve("easeOutQuint", {
     type = "bezier",
     points = {
@@ -83,6 +89,8 @@ hl.curve("quick", {
     },
 })
 
+-- Physical spring curves
+
 hl.curve("workspaceSpring", {
     type = "spring",
     mass = 1,
@@ -112,7 +120,7 @@ hl.curve("windowMoveSpring", {
 })
 
 -- =============================================================================
--- Animations
+-- Global animation
 -- =============================================================================
 
 hl.animation({
@@ -122,12 +130,9 @@ hl.animation({
     bezier = "default",
 })
 
-hl.animation({
-    leaf = "border",
-    enabled = true,
-    speed = 5.39,
-    bezier = "easeOutQuint",
-})
+-- =============================================================================
+-- Window animations
+-- =============================================================================
 
 hl.animation({
     leaf = "windows",
@@ -159,26 +164,21 @@ hl.animation({
     spring = "windowMoveSpring",
 })
 
-hl.animation({
-    leaf = "fadeIn",
-    enabled = true,
-    speed = 1.73,
-    bezier = "almostLinear",
-})
+-- =============================================================================
+-- Workspace animations
+-- =============================================================================
 
 hl.animation({
-    leaf = "fadeOut",
+    leaf = "workspaces",
     enabled = true,
-    speed = 1.46,
-    bezier = "almostLinear",
+    speed = 4,
+    spring = "workspaceSpring",
+    style = "slidefade 20%",
 })
 
-hl.animation({
-    leaf = "fade",
-    enabled = true,
-    speed = 3.03,
-    bezier = "quick",
-})
+-- =============================================================================
+-- Layer animations
+-- =============================================================================
 
 hl.animation({
     leaf = "layers",
@@ -217,12 +217,36 @@ hl.animation({
     bezier = "almostLinear",
 })
 
+-- =============================================================================
+-- Fade / miscellaneous animations
+-- =============================================================================
+
 hl.animation({
-    leaf = "workspaces",
+    leaf = "fade",
     enabled = true,
-    speed = 4,
-    spring = "workspaceSpring",
-    style = "slidefade 20%",
+    speed = 3.03,
+    bezier = "quick",
+})
+
+hl.animation({
+    leaf = "fadeIn",
+    enabled = true,
+    speed = 1.73,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "fadeOut",
+    enabled = true,
+    speed = 1.46,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "border",
+    enabled = true,
+    speed = 5.39,
+    bezier = "easeOutQuint",
 })
 
 hl.animation({
