@@ -91,6 +91,34 @@ hl.curve("quick", {
     },
 })
 
+hl.curve("workspaceSpring", {
+    type = "spring",
+    mass = 1,
+    stiffness = 220,
+    dampening = 20,
+})
+
+hl.curve("windowInSpring", {
+    type = "spring",
+    mass = 1,
+    stiffness = 260,
+    dampening = 22,
+})
+
+hl.curve("windowOutSpring", {
+    type = "spring",
+    mass = 1,
+    stiffness = 300,
+    dampening = 26,
+})
+
+hl.curve("windowMoveSpring", {
+    type = "spring",
+    mass = 1,
+    stiffness = 240,
+    dampening = 24,
+})
+
 -- =============================================================================
 -- Animations
 -- =============================================================================
@@ -119,19 +147,25 @@ hl.animation({
 hl.animation({
     leaf = "windowsIn",
     enabled = true,
-    speed = 4.1,
-    bezier = "easeOutQuint",
+    speed = 4,
+    spring = "windowInSpring",
     style = "popin 87%",
 })
 
 hl.animation({
     leaf = "windowsOut",
     enabled = true,
-    speed = 1.49,
-    bezier = "linear",
+    speed = 3,
+    spring = "windowOutSpring",
     style = "popin 87%",
 })
 
+hl.animation({
+    leaf = "windowsMove",
+    enabled = true,
+    speed = 4,
+    spring = "windowMoveSpring",
+})
 hl.animation({
     leaf = "fadeIn",
     enabled = true,
@@ -194,7 +228,7 @@ hl.animation({
     leaf = "workspaces",
     enabled = true,
     speed = 4,
-    bezier = "easeOutQuint",
+    spring = "workspaceSpring",
     style = "slidefade 20%",
 })
 
