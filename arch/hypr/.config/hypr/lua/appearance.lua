@@ -6,8 +6,8 @@
 
 hl.config({
     general = {
-        gaps_in = 5,
-        gaps_out = 10,
+        gaps_in = 6,
+        gaps_out = 14,
         border_size = 2,
 
         col = {
@@ -27,16 +27,16 @@ hl.config({
     },
 
     decoration = {
-        rounding = 10,
-        rounding_power = 2,
+        rounding = 12,
+        rounding_power = 4,
         active_opacity = 1.0,
         inactive_opacity = 1.0,
 
         shadow = {
             enabled = true,
-            range = 4,
+            range = 8,
             render_power = 3,
-            color = "rgba(1a1a1aee)",
+            color = "rgba(1a1a1aaa)",
         },
 
         blur = {
