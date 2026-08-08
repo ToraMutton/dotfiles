@@ -33,18 +33,7 @@ alias unsol="cd ~ && fusermount3 -u ~/uec_sol && echo 'solを切断しました'
 alias unced="cd ~ && fusermount3 -u ~/uec_ced && echo 'cedを切断しました'"
 alias unied="cd ~ && fusermount3 -u ~/uec_ied && echo 'iedを切断しました'"
 
-# dotfiles自動保存（シェル終了時）
-_dotfiles_autosave() {
-    cd ~/dotfiles
-    if [[ -n $(git status --porcelain) ]]; then
-        git add -A
-        git commit -m "auto: sync $(date '+%Y-%m-%d %H:%M')" --quiet
-    fi
-    # commitの有無に関わらず、pushし忘れがあれば拾う
-    if [[ -n $(git log origin/main..HEAD 2>/dev/null) ]]; then
-        git push --quiet
-    fi
-}
+
 
 # ウィンドウを閉じた時の自動片付け
 trap '
@@ -64,11 +53,6 @@ if grep -qi "microsoft" /proc/version 2>/dev/null; then
     export PATH="$PATH:/mnt/c/Users/Mylot/AppData/Local/Programs/Zed/bin"
 fi
 
-# dotfiles自動同期
-
-if grep -qi "microsoft" /proc/version 2>/dev/null; then
-    (cd ~/dotfiles && git pull --quiet 2>/dev/null &)
-fi
 
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
 alias zed='zeditor'
