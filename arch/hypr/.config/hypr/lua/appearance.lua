@@ -65,14 +65,6 @@ hl.curve("easeOutQuint", {
     },
 })
 
-hl.curve("linear", {
-    type = "bezier",
-    points = {
-        { 0, 0 },
-        { 1, 1 },
-    },
-})
-
 hl.curve("quick", {
     type = "bezier",
     points = {
@@ -175,63 +167,20 @@ hl.animation({
 hl.animation({
     leaf = "layers",
     enabled = true,
-    speed = 3.81,
-    bezier = "easeOutQuint",
-})
-
-hl.animation({
-    leaf = "layersIn",
-    enabled = true,
-    speed = 4,
+    speed = 3,
     bezier = "easeOutQuint",
     style = "fade",
-})
-
-hl.animation({
-    leaf = "layersOut",
-    enabled = true,
-    speed = 1.5,
-    bezier = "linear",
-    style = "fade",
-})
-
-hl.animation({
-    leaf = "fadeLayersIn",
-    enabled = true,
-    speed = 1.79,
-    bezier = "easeOutQuint",
-})
-
-hl.animation({
-    leaf = "fadeLayersOut",
-    enabled = true,
-    speed = 1.39,
-    bezier = "easeOutQuint",
 })
 
 -- =============================================================================
--- Fade / miscellaneous animations
+-- Fade animation
 -- =============================================================================
 
 hl.animation({
     leaf = "fade",
     enabled = true,
-    speed = 3.03,
+    speed = 3,
     bezier = "quick",
-})
-
-hl.animation({
-    leaf = "fadeIn",
-    enabled = true,
-    speed = 1.73,
-    bezier = "easeOutQuint",
-})
-
-hl.animation({
-    leaf = "fadeOut",
-    enabled = true,
-    speed = 1.46,
-    bezier = "easeOutQuint",
 })
 
 hl.animation({
