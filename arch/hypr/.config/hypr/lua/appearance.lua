@@ -73,14 +73,6 @@ hl.curve("linear", {
     },
 })
 
-hl.curve("almostLinear", {
-    type = "bezier",
-    points = {
-        { 0.5,  0.5 },
-        { 0.75, 1 },
-    },
-})
-
 hl.curve("quick", {
     type = "bezier",
     points = {
@@ -207,14 +199,14 @@ hl.animation({
     leaf = "fadeLayersIn",
     enabled = true,
     speed = 1.79,
-    bezier = "almostLinear",
+    bezier = "easeOutQuint",
 })
 
 hl.animation({
     leaf = "fadeLayersOut",
     enabled = true,
     speed = 1.39,
-    bezier = "almostLinear",
+    bezier = "easeOutQuint",
 })
 
 -- =============================================================================
@@ -232,14 +224,14 @@ hl.animation({
     leaf = "fadeIn",
     enabled = true,
     speed = 1.73,
-    bezier = "almostLinear",
+    bezier = "easeOutQuint",
 })
 
 hl.animation({
     leaf = "fadeOut",
     enabled = true,
     speed = 1.46,
-    bezier = "almostLinear",
+    bezier = "easeOutQuint",
 })
 
 hl.animation({
