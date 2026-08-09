@@ -183,18 +183,15 @@ hl.animation({
     bezier = "quick",
 })
 
+-- =============================================================================
+-- Visual feedback animations
+-- =============================================================================
+
 hl.animation({
     leaf = "border",
     enabled = true,
-    speed = 5.39,
+    speed = 3,
     bezier = "easeOutQuint",
-})
-
-hl.animation({
-    leaf = "zoomFactor",
-    enabled = true,
-    speed = 7,
-    bezier = "quick",
 })
 
 -- =============================================================================
