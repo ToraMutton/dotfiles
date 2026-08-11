@@ -5,6 +5,7 @@
 local terminal = "kitty"
 local fileManager = "dolphin"
 local menu = "hyprlauncher"
+local editor = "zeditor"
 local mainMod = "SUPER"
 
 
@@ -16,7 +17,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("google-chrome-stable"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("antigravity"))
+hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd(editor))
 
 -- =============================================================================
 -- System operations
