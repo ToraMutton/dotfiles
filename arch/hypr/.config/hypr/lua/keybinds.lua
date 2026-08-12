@@ -59,7 +59,7 @@ hl.bind(
 -- Lock screen
 hl.bind(
     mainMod .. " + L",
-    hl.dsp.exec_cmd("hyprlock")
+    hl.dsp.exec_cmd("caelestia shell lock lock")
 )
 
 -- Toggle Waybar visibility
@@ -489,11 +489,10 @@ hl.bind(
     hl.dsp.exec_cmd("hyprpicker -a")
 )
 
+-- Suspend
 hl.bind(
     mainMod .. " + SHIFT + L",
-    hl.dsp.exec_cmd(
-        "hyprlock && systemctl suspend"
-    )
+    hl.dsp.exec_cmd("systemctl suspend")
 )
 
 
