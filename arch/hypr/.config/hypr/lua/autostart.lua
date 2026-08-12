@@ -26,7 +26,6 @@ hl.env("NIXOS_OZONE_WL", "1")
 hl.on("hyprland.start", function()
     -- Desktop components
     hl.exec_cmd("waybar")
-    hl.exec_cmd("mako")
     hl.exec_cmd("fcitx5 -d")
 
     -- Legacy wallpaper daemon
