@@ -451,7 +451,7 @@ hl.bind(
 -- =============================================================================
 
 hl.bind(
-    mainMod .. " + SHIFT + E",
+    mainMod .. " + X",
     hl.dsp.exec_cmd(
         "caelestia shell drawers toggle session"
     )
