@@ -1,0 +1,24 @@
+{
+    "bar": {
+        "clock": {
+            "showDate": true
+        }
+    },
+    "general": {
+        "idle": {
+            "inhibitWhenAudio": true,
+            "lockBeforeSleep": true,
+            "timeouts": [
+                {
+                    "idleAction": "lock",
+                    "timeout": 900
+                },
+                {
+                    "idleAction": "dpms off",
+                    "returnAction": "dpms on",
+                    "timeout": 1200
+                }
+            ]
+        }
+    }
+}
