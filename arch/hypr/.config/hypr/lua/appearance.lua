@@ -1,3 +1,5 @@
+local scheme = require("scheme.current")
+
 -- Appearance configuration
 
 -- =============================================================================
@@ -13,8 +15,8 @@ hl.config({
         col = {
             active_border = {
                 colors = {
-                    "rgba(33ccffee)",
-                    "rgba(00ff99ee)",
+                    "rgba(" .. scheme.primary .. "ee)",
+                    "rgba(" .. scheme.tertiary .. "ee)",
                 },
                 angle = 45,
             },
