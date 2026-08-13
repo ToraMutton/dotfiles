@@ -92,18 +92,6 @@ hl.window_rule({
 -- Layer rules
 -- =============================================================================
 
--- Blur behind wlogout
-hl.layer_rule({
-    name = "wlogout_blur",
-
-    match = {
-        namespace = "wlogout",
-    },
-
-    blur = true,
-})
-
-
 -- Blur behind wofi
 hl.layer_rule({
     name = "wofi_blur",
