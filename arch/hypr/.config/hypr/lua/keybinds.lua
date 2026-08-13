@@ -4,7 +4,6 @@
 
 local terminal = "kitty"
 local fileManager = "dolphin"
-local menu = "hyprlauncher"
 local editor = "zeditor"
 local mainMod = "SUPER"
 
@@ -15,7 +14,10 @@ local mainMod = "SUPER"
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(
+    mainMod .. " + Space",
+    hl.dsp.exec_cmd("caelestia shell drawers toggle launcher")
+)
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("google-chrome-stable"))
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd(editor))
 
@@ -32,12 +34,6 @@ hl.bind(
     hl.dsp.exec_cmd(
         "command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"
     )
-)
-
--- Restart Waybar
-hl.bind(
-    mainMod .. " + SHIFT + R",
-    hl.dsp.exec_cmd("killall waybar && waybar")
 )
 
 -- =============================================================================
@@ -60,12 +56,6 @@ hl.bind(
 hl.bind(
     mainMod .. " + L",
     hl.dsp.exec_cmd("caelestia shell lock lock")
-)
-
--- Toggle Waybar visibility
-hl.bind(
-    mainMod .. " + B",
-    hl.dsp.exec_cmd("killall -SIGUSR1 waybar")
 )
 
 -- Clipboard history
@@ -134,7 +124,7 @@ end
 
 -- Special workspace
 hl.bind(
-    mainMod .. " + S",
+    mainMod .. " + grave",
     hl.dsp.workspace.toggle_special("magic")
 )
 
@@ -271,38 +261,29 @@ hl.bind(
 -- Screenshots
 -- =============================================================================
 
--- Active window
+-- Quick region screenshot -> clipboard
 hl.bind(
-    "Print",
+    mainMod .. " + S",
     hl.dsp.exec_cmd(
-        "hyprshot -m window -o ~/Pictures/screenshots"
+        "caelestia shell picker openFreezeClip"
     )
 )
 
--- Select region
+-- Region screenshot -> edit with Swappy
 hl.bind(
     mainMod .. " + SHIFT + S",
     hl.dsp.exec_cmd(
-        "hyprshot -m region -o ~/Pictures/screenshots"
+        "caelestia screenshot -r -f"
     )
 )
 
 -- Current output
 hl.bind(
-    mainMod .. " + Print",
-    hl.dsp.exec_cmd(
-        "hyprshot -m output -o ~/Pictures/screenshots"
-    )
-)
-
--- Edit latest screenshot with swappy
-hl.bind(
     mainMod .. " + ALT + S",
     hl.dsp.exec_cmd(
-        'sh -c \'swappy -f "$(ls -t ~/Pictures/screenshots/* | head -n 1)"\''
+        "caelestia screenshot"
     )
 )
-
 
 -- =============================================================================
 -- Media keys
@@ -470,18 +451,10 @@ hl.bind(
 -- =============================================================================
 
 hl.bind(
-    mainMod .. " + N",
-    hl.dsp.exec_cmd("makoctl restore")
-)
-
-hl.bind(
-    mainMod .. " + SHIFT + N",
-    hl.dsp.exec_cmd("makoctl dismiss -a")
-)
-
-hl.bind(
     mainMod .. " + SHIFT + E",
-    hl.dsp.exec_cmd("wlogout")
+    hl.dsp.exec_cmd(
+        "caelestia shell drawers toggle session"
+    )
 )
 
 hl.bind(
