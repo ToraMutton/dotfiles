@@ -1,1 +1,3 @@
 arch/ssh/
+
+arch/hypr/.config/hypr/scheme/current.lua
