@@ -20,7 +20,7 @@ hl.config({
                 },
                 angle = 45,
             },
-            inactive_border = "rgba(595959aa)",
+            inactive_border = "rgba(" .. scheme.outlineVariant .. "aa)",
         },
 
         resize_on_border = false,
