@@ -1,3 +1,4 @@
 arch/ssh/
+*:Zone.Identifier
 
 arch/hypr/.config/hypr/scheme/current.lua

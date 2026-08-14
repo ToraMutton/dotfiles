@@ -33,14 +33,11 @@ alias unsol="cd ~ && fusermount3 -u ~/uec_sol && echo 'solを切断しました'
 alias unced="cd ~ && fusermount3 -u ~/uec_ced && echo 'cedを切断しました'"
 alias unied="cd ~ && fusermount3 -u ~/uec_ied && echo 'iedを切断しました'"
 
-
-
 # ウィンドウを閉じた時の自動片付け
 trap '
     fusermount3 -u ~/uec_sol 2>/dev/null
     fusermount3 -u ~/uec_ced 2>/dev/null
     fusermount3 -u ~/uec_ied 2>/dev/null
-    _dotfiles_autosave
 ' EXIT
 
 # WSL2起動時、Windowsパスにいたらホームに移動
@@ -53,7 +50,6 @@ if grep -qi "microsoft" /proc/version 2>/dev/null; then
     export PATH="$PATH:/mnt/c/Users/Mylot/AppData/Local/Programs/Zed/bin"
 fi
 
-
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
-alias zed='zeditor'
+alias zed="zeditor"
 export PATH=$PATH:/opt/rocm/bin
