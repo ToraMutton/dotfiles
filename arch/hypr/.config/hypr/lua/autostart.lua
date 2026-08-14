@@ -28,23 +28,10 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("caelestia shell -d")
     hl.exec_cmd("fcitx5 -d")
 
-    -- Legacy wallpaper daemon
-    -- TODO: remove after migration (swww has been replaced by awww)
-    hl.exec_cmd("swww-daemon")
-
     -- Discord IPC
     hl.exec_cmd("~/scripts/discord-ipc-link.sh")
 
     -- Clipboard history
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
-
-    -- Wallpapers
-    hl.exec_cmd(
-        'mpvpaper -o "no-audio --loop" DP-2 ~/Pictures/wallpapers/kaguya.png'
-    )
-
-    hl.exec_cmd(
-        'mpvpaper -o "no-audio --loop --panscan=1.0 --video-align-x=0.25" HDMI-A-1 ~/Pictures/wallpapers/moonflower.mp4'
-    )
 end)
