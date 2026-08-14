@@ -1,8 +1,79 @@
 {
+    "appearance": {
+        "transparency": {
+            "enabled": false
+        }
+    },
     "bar": {
+        "activeWindow": {
+            "compact": false,
+            "inverted": false,
+            "showOnHover": false
+        },
         "clock": {
             "showDate": true
+        },
+        "excludedScreens": [
+            "HDMI-A-1"
+        ],
+        "persistent": true,
+        "popouts": {
+            "activeWindow": true,
+            "tray": true
+        },
+        "statusIcons": [
+            {
+                "enabled": true,
+                "id": "lockStatus"
+            },
+            {
+                "enabled": true,
+                "id": "network"
+            },
+            {
+                "enabled": false,
+                "id": "audio"
+            },
+            {
+                "enabled": false,
+                "id": "microphone"
+            },
+            {
+                "enabled": false,
+                "id": "kbLayout"
+            },
+            {
+                "enabled": false,
+                "id": "bluetooth"
+            },
+            {
+                "enabled": false,
+                "id": "battery"
+            },
+            {
+                "enabled": false,
+                "id": "kbLayout"
+            }
+        ],
+        "tray": {
+            "background": false,
+            "compact": false,
+            "recolour": false
+        },
+        "workspaces": {
+            "activeTrail": true,
+            "maxWindowIcons": 5,
+            "occupiedBg": false,
+            "showWindowsOnSpecialWorkspaces": true
         }
+    },
+    "dashboard": {
+        "dragThreshold": 100,
+        "performance": {
+            "showBattery": false,
+            "showNetwork": true
+        },
+        "showOnHover": true
     },
     "general": {
         "idle": {
@@ -20,5 +91,37 @@
                 }
             ]
         }
+    },
+    "utilities": {
+        "quickToggles": [
+            {
+                "enabled": true,
+                "id": "wifi"
+            },
+            {
+                "enabled": true,
+                "id": "bluetooth"
+            },
+            {
+                "enabled": true,
+                "id": "mic"
+            },
+            {
+                "enabled": true,
+                "id": "settings"
+            },
+            {
+                "enabled": true,
+                "id": "gameMode"
+            },
+            {
+                "enabled": true,
+                "id": "dnd"
+            },
+            {
+                "enabled": false,
+                "id": "vpn"
+            }
+        ]
     }
 }
