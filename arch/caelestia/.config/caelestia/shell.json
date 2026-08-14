@@ -1,7 +1,7 @@
 {
     "appearance": {
         "transparency": {
-            "enabled": false
+            "enabled": true
         }
     },
     "bar": {
