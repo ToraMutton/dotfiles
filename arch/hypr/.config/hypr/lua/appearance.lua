@@ -168,10 +168,7 @@ hl.animation({
 
 hl.animation({
     leaf = "layers",
-    enabled = true,
-    speed = 3,
-    bezier = "easeOutQuint",
-    style = "fade",
+    enabled = false,
 })
 
 -- =============================================================================
