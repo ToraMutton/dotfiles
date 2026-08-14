@@ -4,9 +4,6 @@
             "enabled": true
         }
     },
-    "paths": {
-        "sessionGif": "~/.config/caelestia/assets/session/spinningcat.gif"
-    },
     "bar": {
         "activeWindow": {
             "compact": false,
@@ -18,7 +15,9 @@
             "showDate": true,
             "showIcon": true
         },
-        "excludedScreens": ["HDMI-A-1"],
+        "excludedScreens": [
+            "HDMI-A-1"
+        ],
         "persistent": true,
         "popouts": {
             "activeWindow": true,
@@ -105,6 +104,9 @@
             "wallpapers": false
         },
         "vimKeybinds": true
+    },
+    "paths": {
+        "sessionGif": "~/.config/caelestia/assets/session/spinningcat.gif"
     },
     "utilities": {
         "quickToggles": [
