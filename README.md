@@ -1,233 +1,625 @@
 # ToraMutton's dotfiles
 
-> Personal dotfiles for an Arch Linux + Hyprland desktop and a Windows 11 + GlazeWM desktop.
-> Arch configurations are deployed with GNU Stow; Windows and Zed files are kept as explicit, manually applied configurations.
+> Personal dotfiles for an Arch Linux + Hyprland + Caelestia desktop and a Windows 11 + GlazeWM desktop.
+>
+> Arch configurations are managed with GNU Stow. This repository is a record of my actual environment rather than a drop-in rice for arbitrary machines.
 
-個人用の作業環境を記録・再現するための dotfiles リポジトリです。主役は Arch Linux の Hyprland 環境ですが、Windows 11 の GlazeWM + Zebar と、Zed の設定も同居しています。万人向けの「そのまま入れて完成」セットではなく、ハードウェア・ユーザー名・利用サービスに依存する部分を含む実運用の記録です。
+Arch Linux / Hyprland を中心に、普段使っている環境設定を管理している dotfiles リポジトリです。
+
+現在の Arch 環境は **Hyprland の Lua 設定 + Caelestia Shell** を軸に構成しています。
 
 > [!WARNING]
-> このリポジトリの設定を無確認で適用しないでください。とくに `arch/bash/.bashrc` はシェル終了時に `~/dotfiles` の変更を自動コミットし、未 push のコミットを自動 push します。また、Hyprland のモニター名・壁紙パス・起動コマンド、Git のユーザー情報、Windows のアプリ起動コマンドには個人環境依存の値があります。
+> このリポジトリにはモニター名、解像度、個人用スクリプト、SSH 接続名、アプリの起動コマンドなど、私の環境固有の値が含まれています。
+>
+> 内容を確認せず、そのまま Stow しないでください。
 
-## 概要
+---
 
-| 対象 | 内容 |
-| --- | --- |
-| Arch Linux | Hyprland を中心とした Wayland デスクトップ。設定は GNU Stow のパッケージとして `arch/` に整理。 |
-| Windows 11 | GlazeWM のタイル型ウィンドウ管理と、React/Vite で実装した Zebar バー。 |
-| エディタ | Zed の Vim モード、保存時フォーマット、UEC SSH 接続、キーマップ。 |
+## Overview
 
-## Arch Linux 環境の特徴
+| Target              | Stack                                      |
+| ------------------- | ------------------------------------------ |
+| Arch Linux          | Hyprland + Caelestia Shell + Fcitx5 / Mozc |
+| Hyprland config     | Lua                                        |
+| Desktop shell       | Caelestia Shell                            |
+| Windows 11          | GlazeWM + Zebar                            |
+| Editor              | Zed                                        |
+| Dotfiles deployment | GNU Stow                                   |
 
-- **Hyprland**: dwindle レイアウト、半透明・ぼかし・角丸、10 ワークスペース、キーボード中心のウィンドウ操作。
-- **デュアルモニター前提**: `HDMI-A-1`（縦置き 2560x1440@75）と `DP-2`（2560x1440@180）を固定指定している。ほかの構成では必ず `workspaces.conf` を先に編集する。
-- **Waybar**: メディア操作、日時、CPU・温度・メモリ・ネットワーク・音量・トレイ・電源メニューを表示。`playerctl` と Python スクリプトで再生情報を取得する。
-- **日本語入力**: Fcitx5 + Mozc。`Zenkaku_Hankaku` / `Ctrl+Space` などで切り替える設定。
-- **Bash**: UEC サーバー向け SSHFS マウント関数、WSL2 向け PATH 補正、Zed 起動用設定を含む。
-- **外観**: Kitty、Wofi、Wlogout、Cava、Waybar を青緑系の配色で調整。
+---
 
-## ディレクトリ構成
+# Arch Linux Desktop
+
+現在の Arch デスクトップは、Hyprland に個別ツールを横付けするというより、
+
+```text
+Hyprland
+   ↕
+Caelestia Shell
+   ↕
+Dynamic colour scheme
+   ↕
+Wallpaper
+```
+
+を一つのデスクトップ環境として噛み合わせる方針で構成しています。
+
+## Design
+
+### Hyprland is managed in Lua
+
+Hyprland の設定は `.conf` ではなく Lua で管理しています。
+
+```text
+arch/hypr/.config/hypr/
+├── hyprland.lua
+└── lua/
+    ├── appearance.lua
+    ├── autostart.lua
+    ├── input.lua
+    ├── keybinds.lua
+    ├── monitors.lua
+    ├── windowrules.lua
+    └── workspaces.lua
+```
+
+`hyprland.lua` 自体は各モジュールを読み込むだけにして、役割ごとに設定を分割しています。
+
+旧 `.conf` 系設定は廃止済みです。
+
+---
+
+### Caelestia Shell
+
+Caelestia は **Shell / CLI のみ利用**しています。
+
+Caelestia の full dotfiles は導入せず、Hyprland 側は自分で管理しています。
+
+```text
+arch/caelestia/.config/caelestia/
+├── cli.json
+├── shell.json
+└── assets/
+    └── session/
+        └── spinningcat.gif
+```
+
+主に以下を Caelestia に任せています。
+
+- Bar
+- Launcher
+- Dashboard
+- Sidebar
+- Notifications
+- Session / Power menu
+- Lock screen
+- Screenshot / Screen recording UI
+- Wallpaper
+- Dynamic colour scheme
+- Idle / DPMS management
+
+そして当然、
+
+```text
+Session Menu
+    ↓
+spinningcat.gif
+```
+
+も重要な構成要素です。🐈
+
+---
+
+## Appearance
+
+Hyprland 側では、Caelestia の UI を邪魔しない範囲でウィンドウそのものの質感を調整しています。
+
+| Item                | Value / behaviour        |
+| ------------------- | ------------------------ |
+| Inner gap           | `6`                      |
+| Outer gap           | `14`                     |
+| Border              | `2px`                    |
+| Rounding            | `12`                     |
+| Blur                | size `10`, passes `3`    |
+| Layout              | `dwindle`                |
+| Window animation    | spring + `popin 87%`     |
+| Workspace animation | spring + `slidefade 20%` |
+| Layer animation     | disabled                 |
+
+Window / Workspace animation は Hyprland 側で spring animation を使用しています。
+
+一方で Caelestia の Launcher / Dashboard / Sidebar などは Caelestia 内部の animation に任せるため、Hyprland の layer animation は無効化しています。
+
+---
+
+## Dynamic colour scheme
+
+壁紙を起点に、Caelestia と Hyprland の色が連動します。
+
+```text
+Wallpaper
+   ↓
+Caelestia dynamic colour scheme
+   ↓
+Caelestia Shell UI
+   ↓
+~/.config/hypr/scheme/current.lua
+   ↓
+Hyprland window borders
+```
+
+Hyprland の active border は dynamic palette の `primary` / `tertiary` を利用し、inactive border は `outlineVariant` を利用します。
+
+```lua
+active_border = {
+    colors = {
+        "rgba(" .. scheme.primary .. "ee)",
+        "rgba(" .. scheme.tertiary .. "ee)",
+    },
+    angle = 45,
+}
+
+inactive_border = "rgba(" .. scheme.outlineVariant .. "aa)"
+```
+
+`arch/hypr/.config/hypr/scheme/current.lua` は runtime-generated file のため Git 管理していません。
+
+Caelestia CLI の theme integration は Hyprland のみ有効にしており、GTK / Qt / terminal / Zed などへ一括適用しない構成です。
+
+---
+
+## Monitor layout
+
+この設定は現在のデュアルモニター構成に固定されています。
+
+| Output     | Mode            | Position    |
+| ---------- | --------------- | ----------- |
+| `HDMI-A-1` | `2560x1440@75`  | 左 / 縦置き |
+| `DP-2`     | `2560x1440@180` | 右 / メイン |
+
+Caelestia の Bar はメインモニター側で利用し、`HDMI-A-1` では非表示にしています。
+
+別環境へ適用する場合は、最初に以下を確認してください。
+
+```text
+arch/hypr/.config/hypr/lua/monitors.lua
+arch/hypr/.config/hypr/lua/workspaces.lua
+```
+
+---
+
+## Caelestia configuration
+
+現在の主な設定です。
+
+### Bar
+
+- メインモニターのみ表示
+- Workspace active trail 有効
+- Window icons 表示
+- Network status 表示
+- Battery / Bluetooth / Mic など不要な status icon は非表示
+- Workspace scroll 有効
+- Volume scroll 有効
+
+### Launcher
+
+- `SUPER + Space`
+- Vim keybinds 有効
+- 最大表示件数: 9
+- Wallpaper 最大表示件数: 9
+- Fuzzy search は無効
+
+### Dashboard
+
+- Hover で表示
+- Performance information 表示
+- Battery information 非表示
+- Network information 表示
+
+### Utilities
+
+Quick Toggles は次の3つを使用しています。
+
+- Settings
+- Game Mode
+- Do Not Disturb
+
+Wi-Fi / Bluetooth / Mic / VPN toggle は非表示です。
+
+### Idle
+
+```text
+15 min → Lock
+20 min → DPMS off
+```
+
+さらに、
+
+- Audio playback 中は idle を inhibit
+- Sleep 前に lock
+- Automatic suspend は使用しない
+
+というデスクトップ PC 向け構成です。
+
+---
+
+# Keybinds
+
+`SUPER` を main modifier としています。
+
+| Key                    | Action                              |
+| ---------------------- | ----------------------------------- |
+| `SUPER + Space`        | Caelestia Launcher                  |
+| `SUPER + X`            | Session / Power menu                |
+| `SUPER + L`            | Lock                                |
+| `SUPER + SHIFT + L`    | Suspend                             |
+| `SUPER + S`            | Freeze + region picker → clipboard  |
+| `SUPER + SHIFT + S`    | Region screenshot                   |
+| `SUPER + ALT + S`      | Current output screenshot           |
+| `SUPER + R`            | Screen recording                    |
+| `SUPER + Q`            | Kitty                               |
+| `SUPER + E`            | Dolphin                             |
+| `SUPER + Z`            | Zed                                 |
+| `SUPER + F`            | Google Chrome                       |
+| `SUPER + 1..0`         | Workspace 1..10                     |
+| `SUPER + SHIFT + 1..0` | Move window to workspace and follow |
+| `SUPER + V`            | Toggle floating                     |
+| `SUPER + P`            | Toggle pseudotiling                 |
+| `SUPER + J`            | Toggle dwindle split                |
+| `SUPER + W`            | Maximize while keeping gaps / bar   |
+| `SUPER + SHIFT + W`    | True fullscreen                     |
+| `SUPER + Tab`          | Cycle windows                       |
+| `SUPER + grave`        | Toggle special workspace            |
+
+Mouse:
+
+```text
+SUPER + Left Mouse   → Move window
+SUPER + Right Mouse  → Resize window
+SUPER + Scroll       → Change workspace
+```
+
+詳細は以下を参照してください。
+
+```text
+arch/hypr/.config/hypr/lua/keybinds.lua
+```
+
+---
+
+# Autostart
+
+Hyprland 起動時には主に次を開始します。
+
+```text
+caelestia shell -d
+fcitx5 -d
+~/scripts/discord-ipc-link.sh
+wl-paste --type text  --watch cliphist store
+wl-paste --type image --watch cliphist store
+```
+
+`~/scripts/discord-ipc-link.sh` はこのリポジトリには含まれていません。
+
+不要な場合は、
+
+```text
+arch/hypr/.config/hypr/lua/autostart.lua
+```
+
+から削除してください。
+
+---
+
+# Repository structure
 
 ```text
 .
-├── arch/                         # GNU Stow で $HOME に展開する Arch Linux 用パッケージ
-│   ├── bash/                     # ~/.bashrc
-│   ├── cava/                     # ~/.config/cava/
-│   ├── fcitx5/                   # ~/.config/fcitx5/
-│   ├── git/                      # ~/.gitconfig
-│   ├── hypr/                     # ~/.config/hypr/
-│   ├── kitty/                    # ~/.config/kitty/
-│   ├── mimeapps/                 # ~/.config/mimeapps.list
-│   ├── mozc/                     # Mozc のユーザーデータを追跡しないための .gitignore のみ
-│   ├── waybar/                   # ~/.config/waybar/
-│   ├── wlogout/                  # ~/.config/wlogout/
-│   └── wofi/                     # ~/.config/wofi/
+├── arch/
+│   ├── bash/
+│   │   └── .bashrc
+│   │
+│   ├── caelestia/
+│   │   └── .config/caelestia/
+│   │
+│   ├── fcitx5/
+│   │   └── .config/fcitx5/
+│   │
+│   ├── git/
+│   │   └── .gitconfig
+│   │
+│   ├── hypr/
+│   │   └── .config/hypr/
+│   │
+│   ├── kitty/
+│   │   └── .config/kitty/
+│   │
+│   ├── mimeapps/
+│   │   └── .config/mimeapps.list
+│   │
+│   ├── mozc/
+│   │
+│   ├── waybar/
+│   │
+│   ├── wlogout/
+│   │
+│   └── wofi/
+│
 ├── windows/
-│   ├── glazewm/config.yaml        # Windows 11 用タイル型 WM 設定
-│   └── zebar/                    # Zebar 設定と自作 toratora-bar パック
-│       └── toratora-bar/
-│           ├── ui/               # React + Vite のソース
-│           └── toratora-widget/  # Zebar が読むビルド済み成果物
-├── zed/                          # settings.json と keymap.json
-├── .bashrc -> arch/bash/.bashrc   # リポジトリ内での参照用 symlink
-└── .gitconfig -> arch/git/.gitconfig
+│   ├── glazewm/
+│   └── zebar/
+│
+├── zed/
+│
+├── .bashrc
+├── .gitconfig
+└── README.md
 ```
 
-`arch/` の直下の各ディレクトリが **Stow パッケージ名** です。`nvim` や `ssh` は現在存在しないため、古い README にあったそれらの Stow コマンドは使えません。
+Waybar / Wlogout の設定は過去の構成として残していますが、**現在の Arch セッション UI の中心は Caelestia Shell** です。
 
-## 主要なツールと設定
+Wofi は Caelestia Launcher の代替としてではなく、clipboard history selector から現在も利用しています。
 
-| 分類 | ツール / ファイル | 設定していること |
-| --- | --- | --- |
-| Wayland デスクトップ | Hyprland | 見た目、入力、キーバインド、ウィンドウルール、モニターとワークスペース、起動時プログラム。 |
-| バー / 電源メニュー | Waybar / Wlogout | システム状態・メディア表示、電源操作。Waybar は固定の `hwmon3` 温度センサーを参照。 |
-| 入力・ランチャー | Fcitx5 + Mozc / Wofi / `hyprlauncher` | 日本語入力とクリップボード履歴の呼び出し。`hyprlauncher` の設定・導入手順はこのリポジトリにはない。 |
-| 端末・シェル | Kitty / Bash | Kitty の透明度と Hack Nerd Font、SSHFS 補助関数、WSL2 向け処理。 |
-| 音声・メディア | PipeWire/WirePlumber / playerctl / Cava | `wpctl` による音量制御、MPRIS 再生情報、音声スペクトラム用設定。 |
-| Git | Git / Git LFS / GitHub CLI | GitHub の noreply アドレス、`gh auth git-credential`、Git LFS フィルター。 |
-| Windows | GlazeWM / Zebar | Alt キー主体のタイル操作、9 ワークスペース、Zebar に CPU・GPU・温度・ネットワーク・音量等を表示。 |
-| エディタ | Zed | Vim モード、保存時フォーマット、言語別インデント、UEC SSH 接続、Vim 風キーマップ。 |
+---
 
-## 依存関係
+# GNU Stow
 
-### Arch Linux
+Arch 側の dotfiles は GNU Stow で `$HOME` に展開します。
 
-Stow に必要な最小ツールは次の 2 つです。
+## Clone
 
 ```bash
-sudo pacman -S --needed git stow
+git clone https://github.com/ToraMutton/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 ```
 
-設定を機能させるには、少なくとも以下の実行ファイルに対応するソフトウェアが必要です。ディストリビューション標準リポジトリか AUR かは、利用しているパッケージ管理方法で確認してください（ここでは未検証の一括インストールコマンドを載せません）。
+## Dry run first
 
-- セッション: `hyprland`, `kitty`, `waybar`, `wlogout`, `wofi`, `mako`, `hyprlock`, `hyprpicker`
-- 入力・クリップボード: `fcitx5`, Mozc アドオン, `wl-copy` / `wl-paste`, `cliphist`
-- 画面・壁紙: `mpvpaper`, `swww`, `hyprshot`, `swappy`
-- 音量・メディア: PipeWire + WirePlumber（`wpctl`）, `playerctl`, `cava`
-- システム補助: `brightnessctl`, `dolphin`, `google-chrome-stable`, Python 3, Hack Nerd Font
-- 任意の Bash 機能: `sshfs`, `fuse3`, GitHub CLI (`gh`), Git LFS
-
-以下は設定から呼び出されるものの、このリポジトリには導入元や設定本体がありません。
-
-- `hyprlauncher`
-- `hyprshutdown`（存在しない場合は設定上 `hyprctl dispatch exit` にフォールバックする）
-- `~/scripts/discord-ipc-link.sh`
-- `~/Pictures/wallpapers/kaguya.png` と `~/Pictures/wallpapers/moonflower.mp4`
-- `antigravity`
-
-> TODO: 上記の未同梱コマンド・個人用スクリプトをリポジトリで管理するか、起動設定から外すかを決める。
-
-### Windows 11
-
-- GlazeWM
-- Zebar（`windows/zebar/settings.json` は v3.3.1 のスキーマを参照）
-- PowerShell（Zebar が GPU 使用率・温度・VPN 状態の取得に使用）
-- Node.js と npm（`toratora-bar` の UI を変更して再ビルドする場合のみ）
-- `wt`, `explorer`, `chrome`（GlazeWM のキーバインドから起動する場合）
-
-## 安全な導入手順（Arch Linux）
-
-### 1. クローンして内容を確認する
+既存設定へいきなりリンクを張らず、先に dry-run することを推奨します。
 
 ```bash
-git clone https://github.com/ToraMutton/dotfiles.git "$HOME/dotfiles"
-cd "$HOME/dotfiles"
-find arch -maxdepth 2 -type d | sort
+stow -d ~/dotfiles/arch -t ~ --simulate \
+  bash \
+  git \
+  hypr \
+  caelestia \
+  fcitx5 \
+  kitty \
+  mimeapps \
+  wofi
 ```
 
-### 2. 既存設定を退避する
-
-実際にリンクを作る前に、**必要なものだけ**退避する。`~/.config` 全体を削除・置換してはいけません。
+## Apply
 
 ```bash
-backup_dir="$HOME/dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
-mkdir -p "$backup_dir/.config"
-
-for name in hypr kitty waybar wlogout wofi cava fcitx5; do
-  [ -e "$HOME/.config/$name" ] && mv "$HOME/.config/$name" "$backup_dir/.config/"
-done
-[ -e "$HOME/.config/mimeapps.list" ] && mv "$HOME/.config/mimeapps.list" "$backup_dir/.config/"
-[ -e "$HOME/.bashrc" ] && mv "$HOME/.bashrc" "$backup_dir/"
-[ -e "$HOME/.gitconfig" ] && mv "$HOME/.gitconfig" "$backup_dir/"
+stow -d ~/dotfiles/arch -t ~ \
+  bash \
+  git \
+  hypr \
+  caelestia \
+  fcitx5 \
+  kitty \
+  mimeapps \
+  wofi
 ```
 
-### 3. GNU Stow を dry-run する
-
-`--simulate` は何も変更せず、作成予定のリンクと競合を表示します。エラーが出たら次へ進まず、対象だけを確認・退避してください。
+新しいファイルやディレクトリを Stow package 側へ追加した場合は、必要に応じて restow します。
 
 ```bash
-stow --dir=arch --target="$HOME" --no-folding --simulate \
-  bash git hypr kitty waybar wlogout wofi fcitx5 cava mimeapps
+stow -R -d ~/dotfiles/arch -t ~ caelestia
 ```
 
-### 4. 問題なければリンクを作成する
+例えば Caelestia の custom asset を追加した場合、Stow し直さないと `$HOME/.config/caelestia/` 側から見えないことがあります。
 
-```bash
-stow --dir=arch --target="$HOME" --no-folding \
-  bash git hypr kitty waybar wlogout wofi fcitx5 cava mimeapps
-```
+---
 
-`mozc` は追跡対象の設定ファイルを持たず、ユーザーデータを無視するためだけのディレクトリなので Stow の対象に含めません。
+# ⚠️ Important: Git branch switching changes the live desktop
 
-### 5. 適用を確認する
+このリポジトリの Arch 設定は GNU Stow によって `$HOME` 側へ直接リンクされています。
 
-```bash
-readlink -f "$HOME/.config/hypr/hyprland.conf"
-readlink -f "$HOME/.config/waybar/config.jsonc"
-readlink -f "$HOME/.bashrc"
-```
-
-### Stow の実際の使い方
-
-`arch/` を Stow ディレクトリ、`$HOME` をリンク先として明示するのがこのリポジトリでの使い方です。
-
-| 操作 | コマンド |
-| --- | --- |
-| 作成予定を確認 | `stow --dir=arch --target="$HOME" --no-folding --simulate hypr` |
-| 1 パッケージを適用 | `stow --dir=arch --target="$HOME" --no-folding hypr` |
-| 複数を適用 | `stow --dir=arch --target="$HOME" --no-folding hypr waybar kitty` |
-| リンクを外す | `stow --dir=arch --target="$HOME" --no-folding --delete hypr` |
-| リンクを張り直す | `stow --dir=arch --target="$HOME" --no-folding --restow hypr` |
-
-## 競合と個人環境への注意
-
-- Stow は既存の通常ファイルを上書きしない。競合時は削除せず、退避してから `--simulate` を再実行する。
-- `hypr/workspaces.conf` のモニター名・解像度・配置はこの PC 固有。`hyprctl monitors` の結果に合わせて編集する。
-- Waybar の `temperature.hwmon-path` は `/sys/class/hwmon/hwmon3/temp1_input` 固定。環境によっては温度表示が壊れるため、`/sys/class/hwmon/` を確認して変更する。
-- `mimeapps.list` は HTTP/HTTPS を `google-chrome.desktop` に関連付ける。Chrome を使わない場合は適用前に変更する。
-- `.bashrc` の `trap ... EXIT` は SSHFS を unmount し、`~/dotfiles` の変更を Git commit/push する。不要なら **Stow する前に** 該当部分を削除または無効化する。
-- `.gitconfig` には個人の GitHub noreply メールアドレス、Git LFS、`gh` の認証ヘルパー、エディタ `nano` が設定されている。共有 PC や別アカウントにはそのまま適用しない。
-- Zed の SSH 接続先（`uec-sol`, `ced-orange`, `ied`）は、別途 `~/.ssh/config` にホスト定義と認証情報があることを前提にする。このリポジトリは `arch/ssh/` を意図的に追跡しない。
-- `errors.log` は現時点で空ファイル。Zebar のログ保存先・運用方法はリポジトリから確定できない。
-
-## Windows 設定の導入
-
-Windows 側は Stow で展開しません。GlazeWM を起動して既定の設定を生成した後、既存ファイルをバックアップしてからコピーします。GlazeWM の既定設定パスは `%USERPROFILE%\.glzr\glazewm\config.yaml` です。
-
-```powershell
-$repo = Join-Path $HOME 'dotfiles'
-$dest = Join-Path $HOME '.glzr\glazewm\config.yaml'
-$backup = "$dest.bak-$(Get-Date -Format yyyyMMdd-HHmmss)"
-
-New-Item -ItemType Directory -Force (Split-Path $dest) | Out-Null
-if (Test-Path $dest) { Copy-Item $dest $backup }
-Copy-Item "$repo\windows\glazewm\config.yaml" $dest
-```
-
-Zebar は `windows/zebar/` に設定・パック・ビルド済みウィジェットを含みます。Zebar 側のインポート先・配布手順はこのリポジトリ内で自動化されていないため、既存の Zebar 設定をバックアップしたうえで、アプリの現在の設定ディレクトリと照合して手動で配置してください。
-
-`toratora-bar` を編集した場合だけ、次で成果物を更新します。
-
-```bash
-cd windows/zebar/toratora-bar/ui
-npm ci
-npm run build
-```
-
-> TODO: Zebar の設定・パックを Windows のどのパスへ配置するか、およびインポート手順をこのリポジトリで明文化する。
-
-## Zed 設定
-
-`zed/settings.json` と `zed/keymap.json` は Stow パッケージではありません。Zed の OS ごとの設定ディレクトリへコピーする前に、既存の設定とマージしてください。特に `ssh_connections` はローカルの SSH ホスト名に依存します。
-
-> TODO: Linux / Windows それぞれで採用する Zed 設定配置先と、安全な同期方法を決める。
-
-## スクリーンショット
-
-現時点でリポジトリにスクリーンショットはありません。追加する場合は、ルートに `assets/screenshots/` を作成し、用途が分かる名前で保存します。
+つまり、
 
 ```text
-assets/screenshots/
-├── arch-hyprland-overview.png
-├── windows-glazewm-zebar.png
-└── zebar-toratora-bar.png
+Git working tree
+      ↓
+GNU Stow symlink
+      ↓
+~/.config/*
+      ↓
+running desktop
 ```
 
-README から参照する画像は、例えば `![Arch Linux desktop](assets/screenshots/arch-hyprland-overview.png)` の形式で配置します。実機の通知・ユーザー名・ファイルパスなど、公開したくない情報を写さないようにしてください。
+という関係になっています。
 
-## ライセンス・利用上の注意
+そのため **Git branch を切り替えると、稼働中の設定ファイルもその場で切り替わります。**
 
-このリポジトリには現時点で `LICENSE` ファイルがありません。したがって、再配布・改変・商用利用の条件は明示されていません。
+例えば、
 
-設定を参考にする場合は自己責任で、個人情報・認証情報・マシン固有のパスを自分の環境に合わせて置き換えてください。フォント、アイコン、各アプリケーション、Zebar の依存パッケージにはそれぞれのライセンスが適用されます。
+```text
+hyprland.lua が存在する branch
+          ↓
+git switch
+          ↓
+hyprland.lua が存在しない古い branch
+```
 
-> TODO: このリポジトリに適用するライセンスを選び、`LICENSE` ファイルを追加する。
+と移動すると、実行中の Hyprland が設定ファイルを見失うことがあります。
+
+大きな branch 操作を行う場合は、
+
+1. Working tree を clean にする
+2. Backup branch を作る
+3. 現在稼働中の config が移動先 branch に存在するか確認する
+4. 必要なら checkout せず ref / remote branch の操作だけで済ませる
+
+などの対策を推奨します。
+
+---
+
+# Bash notes
+
+`arch/bash/.bashrc` には個人用設定として次が含まれています。
+
+- UEC server 向け SSHFS mount helper
+- Shell 終了時の SSHFS unmount
+- WSL2 向け PATH 補正
+- Zed alias
+- Zenn preview alias
+- ROCm path
+
+以前存在していた、
+
+```text
+shell exit
+   ↓
+dotfiles auto commit
+   ↓
+auto push
+```
+
+の仕組みは削除済みです。
+
+Git の commit / push は現在すべて手動で行っています。
+
+---
+
+# Dependencies / external commands
+
+このリポジトリは package manifest ではありません。
+
+設定から直接呼び出している主なツールは次の通りです。
+
+### Desktop
+
+- Hyprland with Lua config support
+- Caelestia Shell
+- Caelestia CLI
+- Quickshell
+
+### Input / Clipboard
+
+- Fcitx5
+- Mozc
+- `wl-copy`
+- `wl-paste`
+- `cliphist`
+- Wofi
+
+### Audio / Media
+
+- PipeWire
+- WirePlumber
+- `wpctl`
+- `playerctl`
+
+### Desktop utilities
+
+- `hyprpicker`
+- Kitty
+- Dolphin
+- Zed (`zeditor`)
+- Google Chrome
+
+### Bash helpers
+
+- `sshfs`
+- `fuse3`
+
+必要なものだけ、自分の環境に合わせて導入してください。
+
+Wallpaper files はこのリポジトリでは管理していません。
+
+現在は主に、
+
+```text
+~/Pictures/Wallpapers
+```
+
+を Caelestia の wallpaper directory として使用しています。
+
+---
+
+# Windows 11
+
+`windows/` には Windows 側のデスクトップ設定を保存しています。
+
+主な構成:
+
+- GlazeWM
+- Zebar
+- React
+- Vite
+
+```text
+windows/
+├── glazewm/
+└── zebar/
+    └── toratora-bar/
+        ├── ui/
+        └── toratora-widget/
+```
+
+`ui/` には React + Vite の source、`toratora-widget/` には Zebar が使用する build result を保存しています。
+
+Windows 側のファイルは GNU Stow の対象ではありません。
+
+---
+
+# Zed
+
+`zed/` には Zed の設定を保存しています。
+
+主な内容:
+
+- Vim mode
+- Custom keymap
+- Format on save
+- Language-specific settings
+- Edit predictions
+- UEC server 向け SSH connection entries
+
+SSH host definition や credentials 自体はこの repository では管理していません。
+
+---
+
+# Philosophy
+
+このリポジトリは「設定可能なものを全部設定する」ことを目的にはしていません。
+
+基本方針は、
+
+> **触る理由があるところだけ触る。**
+
+です。
+
+Upstream の default が十分良い部分はそのまま利用し、自分が明確にこだわりたい部分だけを設定します。
+
+特に現在は、
+
+- Hyprland animation
+- Window spacing / appearance
+- Wallpaper-driven dynamic colours
+- Keybinds
+- Desktop PC 向け UI
+- Caelestia panel configuration
+
+を明示的に調整しています。
+
+その結果、
+
+```text
+Arch Linux
++
+Hyprland
++
+Caelestia Shell
++
+Lua
+```
+
+を一つのデスクトップ環境として運用しています。
+
+And yes,
+
+**the spinning cat is intentional.** 🐈🌀
