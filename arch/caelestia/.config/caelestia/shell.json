@@ -94,18 +94,29 @@
             ]
         }
     },
+    "launcher": {
+        "actionPrefix": "/",
+        "maxShown": 9,
+        "maxWallpapers": 9,
+        "useFuzzy": {
+            "actions": false,
+            "apps": false,
+            "wallpapers": false
+        },
+        "vimKeybinds": true
+    },
     "utilities": {
         "quickToggles": [
             {
-                "enabled": true,
+                "enabled": false,
                 "id": "wifi"
             },
             {
-                "enabled": true,
+                "enabled": false,
                 "id": "bluetooth"
             },
             {
-                "enabled": true,
+                "enabled": false,
                 "id": "mic"
             },
             {
