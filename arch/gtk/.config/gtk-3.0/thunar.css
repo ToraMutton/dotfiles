@@ -1,0 +1,205 @@
+/* Thunar theme - Hyprland + Caelestia inspired */
+
+.thunar.background,
+.thunar window,
+.thunar grid,
+.thunar paned {
+    background-color: #020304;
+    color: #dfe6ed;
+}
+
+.thunar .titlebar {
+    background-color: #0a0d10;
+    color: #dfe6ed;
+    border: none;
+    box-shadow: none;
+    padding: 8px 8px 6px 8px;
+}
+
+.thunar .titlebar label,
+.thunar .titlebar button,
+.thunar .titlebar image {
+    color: #dfe6ed;
+}
+
+.thunar toolbar {
+    background-color: #0a0d10;
+    color: #dfe6ed;
+    border: none;
+}
+
+.thunar entry {
+    background-color: #101418;
+    color: #e9f0f6;
+    caret-color: #a6cbe6;
+    border: 1px solid alpha(#a6cbe6, 0.12);
+    border-radius: 10px;
+    padding: 7px 10px;
+}
+
+.thunar entry selection {
+    background-color: alpha(#a6cbe6, 0.28);
+    color: #ffffff;
+}
+
+.thunar button,
+.thunar .path-bar-button,
+.thunar .location-button {
+    color: #dfe6ed;
+    background-color: transparent;
+    border-radius: 9px;
+    border: none;
+    box-shadow: none;
+    transition: 160ms ease;
+}
+
+.thunar button:hover,
+.thunar .path-bar-button:hover,
+.thunar .location-button:hover {
+    background-color: alpha(#a6cbe6, 0.09);
+    color: #eef8ff;
+}
+
+.thunar .location-button.toggle:checked,
+.thunar .path-bar-button.toggle:checked {
+    background-color: alpha(#a6cbe6, 0.17);
+    color: #dff2ff;
+}
+
+.thunar .frame.standard-view {
+    margin: 10px 14px 0 8px;
+    padding: 10px;
+    background-color: #050709;
+    border: 1px solid alpha(#a6cbe6, 0.06);
+    border-radius: 14px;
+    box-shadow: none;
+}
+
+.thunar .frame.standard-view .view {
+    background-color: transparent;
+    color: #dfe6ed;
+}
+
+.thunar .frame.standard-view .view label,
+.thunar .frame.standard-view .view text,
+.thunar .frame.standard-view iconview,
+.thunar iconview,
+.thunar treeview {
+    color: #dfe6ed;
+}
+
+.thunar .frame.standard-view .view:selected,
+.thunar .frame.standard-view .view *:selected,
+.thunar iconview:selected,
+.thunar treeview:selected {
+    background-color: alpha(#a6cbe6, 0.16);
+    color: #eaf7ff;
+    border-radius: 9px;
+}
+
+.thunar .rubberband {
+    background-color: alpha(#a6cbe6, 0.12);
+    border: 1px solid alpha(#a6cbe6, 0.32);
+}
+
+.thunar .sidebar {
+    padding: 8px 10px 8px 12px;
+    background-color: #050709;
+    color: #cbd5df;
+    border-right: 1px solid alpha(#a6cbe6, 0.06);
+}
+
+.thunar .sidebar .view {
+    padding: 7px 8px;
+    background-color: transparent;
+    color: #cbd5df;
+    border-radius: 9px;
+}
+
+.thunar .sidebar .view:hover {
+    background-color: alpha(#dfe6ed, 0.07);
+    color: #ffffff;
+}
+
+.thunar .sidebar .view:selected {
+    background-color: alpha(#a6cbe6, 0.16);
+    color: #dff2ff;
+}
+
+.thunar .sidebar label {
+    color: #cbd5df;
+}
+
+.thunar header.top {
+    background-color: #0a0d10;
+    color: #dfe6ed;
+    padding: 2px 8px;
+}
+
+.thunar header.top tabs .reorderable-page {
+    color: #aeb9c4;
+    border-radius: 9px;
+    transition: 160ms ease;
+}
+
+.thunar header.top tabs .reorderable-page:hover {
+    background-color: alpha(#a6cbe6, 0.08);
+    color: #eef8ff;
+}
+
+.thunar header.top tabs .reorderable-page:checked {
+    background-color: alpha(#a6cbe6, 0.16);
+    color: #dff2ff;
+}
+
+/* Top menu bar */
+.thunar menubar {
+    background-color: #0a0d10;
+    color: #dfe6ed;
+    border: none;
+    box-shadow: none;
+}
+
+.thunar menu,
+.thunar menuitem,
+.thunar popover {
+    background-color: #0a0d10;
+    color: #dfe6ed;
+}
+
+.thunar menuitem:hover {
+    background-color: alpha(#a6cbe6, 0.14);
+    color: #ffffff;
+}
+
+.thunar statusbar {
+    margin: 10px 14px 12px 8px;
+    padding: 8px 12px;
+    background-color: #080b0e;
+    color: #b9c5d0;
+    border: 1px solid alpha(#a6cbe6, 0.05);
+    border-radius: 12px;
+}
+
+.thunar paned > separator {
+    min-width: 1px;
+    background-color: alpha(#a6cbe6, 0.06);
+}
+
+.thunar scrollbar slider {
+    min-width: 6px;
+    min-height: 28px;
+    background-color: alpha(#dfe6ed, 0.18);
+    border-radius: 999px;
+}
+
+.thunar scrollbar slider:hover {
+    background-color: alpha(#a6cbe6, 0.34);
+}
+
+.thunar *:focus {
+    outline-color: alpha(#a6cbe6, 0.45);
+    outline-style: solid;
+    outline-width: 1px;
+    outline-offset: -1px;
+}

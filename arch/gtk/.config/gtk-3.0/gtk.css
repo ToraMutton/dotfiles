@@ -1,0 +1,42 @@
+/* GTK3 base theme for ToraMutton's Hyprland + Caelestia desktop */
+
+@define-color accent_color #a6cbe6;
+@define-color accent_fg_color #10232f;
+@define-color accent_bg_color #a6cbe6;
+
+@define-color window_bg_color #020304;
+@define-color window_fg_color #dfe6ed;
+
+@define-color headerbar_bg_color #0a0d10;
+@define-color headerbar_fg_color #dfe6ed;
+
+@define-color popover_bg_color #0a0d10;
+@define-color popover_fg_color #dfe6ed;
+
+@define-color view_bg_color #050709;
+@define-color view_fg_color #dfe6ed;
+
+@define-color card_bg_color #080b0e;
+@define-color card_fg_color #dfe6ed;
+
+@define-color sidebar_bg_color #050709;
+@define-color sidebar_fg_color #cbd5df;
+@define-color sidebar_border_color alpha(#a6cbe6, 0.08);
+@define-color sidebar_backdrop_color #050709;
+
+@define-color theme_selected_bg_color alpha(#a6cbe6, 0.18);
+@define-color theme_selected_fg_color #dff2ff;
+
+window,
+dialog,
+.background {
+    color: @window_fg_color;
+}
+
+tooltip,
+popover,
+menu {
+    color: @popover_fg_color;
+}
+
+@import "thunar.css";
