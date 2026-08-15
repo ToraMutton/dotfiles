@@ -3,7 +3,7 @@
 -- =============================================================================
 
 local terminal = "kitty"
-local fileManager = "dolphin"
+local fileManager = "thunar"
 local editor = "zeditor"
 local mainMod = "SUPER"
 
