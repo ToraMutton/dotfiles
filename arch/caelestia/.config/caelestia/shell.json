@@ -78,6 +78,11 @@
         "showOnHover": true
     },
     "general": {
+        "apps": {
+            "explorer": [
+                "thunar"
+            ]
+        },
         "idle": {
             "inhibitWhenAudio": true,
             "lockBeforeSleep": true,
