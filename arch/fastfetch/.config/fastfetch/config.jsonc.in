@@ -36,6 +36,15 @@
       "width": 10
     },
 
+    "temp": {
+        "ndigits": 1,
+        "color": {
+            "green": "#@BAR_GOOD@",
+            "yellow": "#@BAR_WARN@",
+              "red": "#@BAR_BAD@"
+      }
+    },
+
     "bar": {
       "char": {
         "elapsed": "━",
