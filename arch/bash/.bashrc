@@ -33,6 +33,11 @@ alias unsol="cd ~ && fusermount3 -u ~/uec_sol && echo 'solを切断しました'
 alias unced="cd ~ && fusermount3 -u ~/uec_ced && echo 'cedを切断しました'"
 alias unied="cd ~ && fusermount3 -u ~/uec_ied && echo 'iedを切断しました'"
 
+# fastfetch
+if [[ -x "$HOME/.local/bin/fastfetch-themed" ]]; then
+    alias fastfetch="$HOME/.local/bin/fastfetch-themed"
+fi
+
 # ウィンドウを閉じた時の自動片付け
 trap '
     fusermount3 -u ~/uec_sol 2>/dev/null
