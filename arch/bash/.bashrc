@@ -52,7 +52,16 @@ fi
 
 # WSL2: Zed CLIへのパスを通す（appendWindowsPath=falseの補完）
 if grep -qi "microsoft" /proc/version 2>/dev/null; then
-    export PATH="$PATH:/mnt/c/Users/WINDOWS_USER/AppData/Local/Programs/Zed/bin"
+    _dotfiles_win_cmd="$(command -v cmd.exe || true)"
+    [[ -n "$_dotfiles_win_cmd" ]] || _dotfiles_win_cmd="/mnt/c/Windows/System32/cmd.exe"
+    if [[ -x "$_dotfiles_win_cmd" ]] && command -v wslpath >/dev/null 2>&1; then
+        _dotfiles_win_appdata="$("$_dotfiles_win_cmd" /D /C 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+        if [[ -n "$_dotfiles_win_appdata" && "$_dotfiles_win_appdata" != '%LOCALAPPDATA%' ]]; then
+            _dotfiles_zed_bin="$(wslpath -u "${_dotfiles_win_appdata}\\Programs\\Zed\\bin" 2>/dev/null)"
+            [[ -d "$_dotfiles_zed_bin" ]] && export PATH="$PATH:$_dotfiles_zed_bin"
+        fi
+    fi
+    unset _dotfiles_win_cmd _dotfiles_win_appdata _dotfiles_zed_bin
 fi
 
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
