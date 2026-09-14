@@ -3,7 +3,7 @@
 -- =============================================================================
 
 local terminal = "kitty"
-local fileManager = "thunar"
+local fileManager = "nautilus"
 local editor = "zeditor"
 local mainMod = "SUPER"
 
