@@ -111,8 +111,8 @@
         "vimKeybinds": true
     },
     "lock": {
-  	"enableFprint": true,
-  	"maxFprintTries": 3
+    "enableFprint": true,
+    "maxFprintTries": 3
     },
     "paths": {
         "sessionGif": "~/.config/caelestia/assets/session/spinningcat.gif"
