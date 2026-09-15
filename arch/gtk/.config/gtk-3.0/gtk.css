@@ -38,5 +38,3 @@ popover,
 menu {
     color: @popover_fg_color;
 }
-
-@import "thunar.css";

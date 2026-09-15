@@ -80,7 +80,7 @@
     "general": {
         "apps": {
             "explorer": [
-                "thunar"
+                "nautilus"
             ]
         },
         "idle": {
