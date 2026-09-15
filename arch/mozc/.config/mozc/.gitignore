@@ -2,5 +2,3 @@
 *.ipc
 *.lock
 .registry
-
-!config1.db

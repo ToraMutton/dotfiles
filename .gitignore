@@ -2,3 +2,6 @@ arch/ssh/
 *:Zone.Identifier
 
 arch/hypr/.config/hypr/scheme/current.lua
+
+# Never track Mozc runtime databases
+arch/mozc*/.config/mozc/*.db
