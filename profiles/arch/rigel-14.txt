@@ -1,0 +1,3 @@
+# Dell 14 Plus DB14250
+fcitx5-rigel-14
+nautilus-rigel-14

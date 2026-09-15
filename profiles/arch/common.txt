@@ -1,0 +1,10 @@
+# Shared Arch Linux Stow packages
+bash
+caelestia
+fastfetch
+git
+gtk
+hypr
+kitty
+mimeapps
+nautilus

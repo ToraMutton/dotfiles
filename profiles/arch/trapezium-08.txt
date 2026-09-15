@@ -1,0 +1,3 @@
+# Desktop-only packages
+bash-trapezium-08
+fcitx5-trapezium-08

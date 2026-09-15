@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+usage() {
+    printf '%s\n' \
+        'Usage:' \
+        '  ./scripts/stow-arch             Dry-run for the current hostname' \
+        '  ./scripts/stow-arch --dry-run   Same as above' \
+        '  ./scripts/stow-arch --apply     Dry-run, confirm, then apply'
+}
+
+mode="dry-run"
+
+case "${1:-}" in
+    ""|--dry-run)
+        ;;
+    --apply)
+        mode="apply"
+        ;;
+    -h|--help)
+        usage
+        exit 0
+        ;;
+    *)
+        printf 'Error: unknown option: %s\n' "$1" >&2
+        usage >&2
+        exit 2
+        ;;
+esac
+
+if (( EUID == 0 )); then
+    printf 'Error: do not run this script as root.\n' >&2
+    exit 1
+fi
+
+if ! command -v stow >/dev/null 2>&1; then
+    printf 'Error: GNU Stow is not installed.\n' >&2
+    exit 1
+fi
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repo_dir="$(cd -- "$script_dir/.." && pwd -P)"
+stow_dir="$repo_dir/arch"
+profiles_dir="$repo_dir/profiles/arch"
+host="$(hostname -s)"
+
+common_profile="$profiles_dir/common.txt"
+host_profile="$profiles_dir/$host.txt"
+
+if [[ ! -r "$common_profile" ]]; then
+    printf 'Error: missing profile: %s\n' "$common_profile" >&2
+    exit 1
+fi
+
+if [[ ! -r "$host_profile" ]]; then
+    printf 'Error: unsupported hostname: %s\n' "$host" >&2
+    printf 'Available host profiles:\n' >&2
+    find "$profiles_dir" -maxdepth 1 -type f \
+        ! -name 'common.txt' -printf '  %f\n' |
+        sort >&2
+    exit 1
+fi
+
+packages=()
+
+load_profile() {
+    local profile="$1"
+    local line
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line="${line%%#*}"
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+
+        [[ -z "$line" ]] && continue
+
+        if [[ ! "$line" =~ ^[A-Za-z0-9][A-Za-z0-9._+-]*$ ]]; then
+            printf 'Error: invalid package in %s: %s\n' \
+                "$profile" "$line" >&2
+            exit 1
+        fi
+
+        packages+=("$line")
+    done < "$profile"
+}
+
+load_profile "$common_profile"
+load_profile "$host_profile"
+
+declare -A seen=()
+
+for package in "${packages[@]}"; do
+    if [[ -n "${seen[$package]+present}" ]]; then
+        printf 'Error: duplicate package: %s\n' "$package" >&2
+        exit 1
+    fi
+    seen["$package"]=1
+
+    if [[ ! -d "$stow_dir/$package" ]]; then
+        printf 'Error: package directory not found: %s\n' \
+            "$stow_dir/$package" >&2
+        exit 1
+    fi
+done
+
+printf 'Host:   %s\n' "$host"
+printf 'Mode:   %s\n' "$mode"
+printf 'Target: %s\n' "$HOME"
+printf 'Packages:\n'
+printf '  - %s\n' "${packages[@]}"
+
+stow_command=(
+    stow
+    --dir="$stow_dir"
+    --target="$HOME"
+    --no-folding
+    --restow
+    --verbose=2
+)
+
+printf '\nRunning dry-run...\n'
+"${stow_command[@]}" --simulate "${packages[@]}"
+
+if [[ "$mode" == "dry-run" ]]; then
+    printf '\nDry-run completed. No files were changed.\n'
+    exit 0
+fi
+
+printf '\n'
+read -r -p 'Apply this Stow profile? [y/N] ' answer
+
+case "$answer" in
+    y|Y|yes|YES)
+        ;;
+    *)
+        printf 'Cancelled. No files were changed.\n'
+        exit 0
+        ;;
+esac
+
+"${stow_command[@]}" "${packages[@]}"
+printf '\nStow profile applied successfully.\n'

@@ -259,7 +259,7 @@ Wi-Fi / Bluetooth / Mic / VPN toggle は非表示です。
 | `SUPER + ALT + S`      | Current output screenshot           |
 | `SUPER + R`            | Screen recording                    |
 | `SUPER + Q`            | Kitty                               |
-| `SUPER + E`            | Dolphin                             |
+| `SUPER + E`            | Nautilus                             |
 | `SUPER + Z`            | Zed                                 |
 | `SUPER + F`            | Google Chrome                       |
 | `SUPER + 1..0`         | Workspace 1..10                     |
@@ -296,8 +296,8 @@ Hyprland 起動時には主に次を開始します。
 caelestia shell -d
 fcitx5 -d
 ~/scripts/discord-ipc-link.sh
-wl-paste --type text  --watch cliphist store
-wl-paste --type image --watch cliphist store
+wl-paste --type text  --watch cliphist -max-items 20 store
+wl-paste --type image --watch cliphist -max-items 20 store
 ```
 
 `~/scripts/discord-ipc-link.sh` はこのリポジトリには含まれていません。
@@ -316,92 +316,158 @@ arch/hypr/.config/hypr/lua/autostart.lua
 
 ```text
 .
-├── arch/
+├── arch/                         # GNU Stow packages
 │   ├── bash/
-│   │   └── .bashrc
-│   │
+│   ├── bash-trapezium-08/
 │   ├── caelestia/
-│   │   └── .config/caelestia/
-│   │
-│   ├── fcitx5/
-│   │   └── .config/fcitx5/
-│   │
+│   ├── fastfetch/
+│   ├── fcitx5-rigel-14/
+│   ├── fcitx5-trapezium-08/
 │   ├── git/
-│   │   └── .gitconfig
-│   │
+│   ├── gtk/
 │   ├── hypr/
-│   │   └── .config/hypr/
-│   │
 │   ├── kitty/
-│   │   └── .config/kitty/
-│   │
 │   ├── mimeapps/
-│   │   └── .config/mimeapps.list
-│   │
-│   ├── mozc/
-│   │
+│   ├── nautilus/
+│   └── nautilus-rigel-14/
+│
+├── profiles/
+│   └── arch/
+│       ├── common.txt
+│       ├── rigel-14.txt
+│       └── trapezium-08.txt
+│
+├── scripts/
+│   └── stow-arch
 │
 ├── windows/
 │   ├── glazewm/
 │   └── zebar/
 │
 ├── zed/
-│
-├── .bashrc
-├── .gitconfig
+├── .gitattributes
+├── .gitignore
 └── README.md
-```
+````
 
-Clipboard history selector には、Caelestia CLIの依存として導入されるFuzzelを利用します。
+Clipboard history selectorには、Caelestia CLIの依存として導入されるFuzzelを利用します。
 
 ---
 
-# GNU Stow
+# Hostname-aware GNU Stow
 
-Arch 側の dotfiles は GNU Stow で `$HOME` に展開します。
+Arch側のdotfilesは、hostnameに対応するprofileを選択してGNU Stowで`$HOME`へ展開します。
 
-## Clone
+```text
+hostname -s
+    ↓
+profiles/arch/common.txt
+    +
+profiles/arch/<hostname>.txt
+    ↓
+scripts/stow-arch
+    ↓
+$HOMEへのsymlink
+```
+
+## Supported hosts
+
+| Hostname       | Machine-specific packages                  |
+| -------------- | ------------------------------------------ |
+| `rigel-14`     | `fcitx5-rigel-14`, `nautilus-rigel-14`     |
+| `trapezium-08` | `bash-trapezium-08`, `fcitx5-trapezium-08` |
+
+両PCで利用するパッケージは`profiles/arch/common.txt`へ記載します。
+
+## Initial setup
 
 ```bash
 git clone https://github.com/ToraMutton/dotfiles.git ~/dotfiles
 cd ~/dotfiles
+./scripts/stow-arch
+./scripts/stow-arch --apply
 ```
 
-## Dry run first
+引数なしではdry-runだけを行い、ファイルを変更しません。
 
-既存設定へいきなりリンクを張らず、先に dry-run することを推奨します。
+`--apply`を指定した場合も、先にdry-runを実行し、確認後にのみ適用します。
+
+## Existing clone
 
 ```bash
-stow -d ~/dotfiles/arch -t ~ --simulate \
-  bash \
-  git \
-  hypr \
-  caelestia \
-  fcitx5 \
-  kitty \
-  mimeapps
+cd ~/dotfiles
+git pull --ff-only
+./scripts/stow-arch
+./scripts/stow-arch --apply
 ```
 
-## Apply
+取得済みで変更内容も確認済みなら、適用操作は次の1コマンドです。
 
 ```bash
-stow -d ~/dotfiles/arch -t ~ \
-  bash \
-  git \
-  hypr \
-  caelestia \
-  fcitx5 \
-  kitty \
-  mimeapps
+~/dotfiles/scripts/stow-arch --apply
 ```
 
-新しいファイルやディレクトリを Stow package 側へ追加した場合は、必要に応じて restow します。
+## Safety properties
 
-```bash
-stow -R -d ~/dotfiles/arch -t ~ caelestia
+`scripts/stow-arch`は次を検査します。
+
+* rootユーザーでは実行しない
+* GNU Stowが導入されている
+* hostnameに対応するprofileが存在する
+* profile内のパッケージ名が正しい
+* 同じパッケージが重複していない
+* 各Stowパッケージのディレクトリが存在する
+* 実適用前にdry-runが成功する
+
+未登録hostnameでは処理を停止します。
+
+また、`--no-folding`によって設定ディレクトリ全体をsymlinkにせず、管理対象ファイルだけを個別にリンクします。
+
+これにより、アプリが生成するキャッシュや実行時データがdotfilesへ入り込むことを防ぎます。
+
+## Managed and local files
+
+Git管理する設定の例:
+
+```text
+~/.bashrc
+~/.gitconfig
+~/.config/hypr/*
+~/.config/caelestia/*
+~/.config/fcitx5/config
+~/.config/fcitx5/profile
+~/.config/mimeapps.list
 ```
 
-例えば Caelestia の custom asset を追加した場合、Stow し直さないと `$HOME/.config/caelestia/` 側から見えないことがあります。
+実機ローカルに残すデータの例:
+
+```text
+~/.config/gtk-3.0/gtk.css
+~/.config/fcitx5/conf/cached_layouts
+~/.config/fcitx5/conf/notifications.conf
+~/.config/mozc/*.db
+~/.cache/cliphist/db
+```
+
+ローカルデータはStow対象ではなく、Gitにも保存しません。
+
+## Adding a package
+
+共通パッケージを追加する場合:
+
+1. `arch/<package>/`へホームディレクトリと同じ構造でファイルを置く
+2. `profiles/arch/common.txt`へパッケージ名を追加
+3. `./scripts/stow-arch`でdry-run
+4. `./scripts/stow-arch --apply`で適用
+
+端末固有の設定は、対応するhostname profileへ追加します。
+
+```text
+profiles/arch/rigel-14.txt
+profiles/arch/trapezium-08.txt
+```
+
+Gitのpull・commit・pushや、依存パッケージのインストールは自動実行しません。
 
 ---
 
@@ -457,7 +523,7 @@ hyprland.lua が存在しない古い branch
 - WSL2 向け PATH 補正
 - Zed alias
 - Zenn preview alias
-- ROCm path
+- Hostname-specific machine profile loading
 
 以前存在していた、
 
@@ -508,7 +574,7 @@ Git の commit / push は現在すべて手動で行っています。
 
 - `hyprpicker`
 - Kitty
-- Dolphin
+- Nautilus
 - Zed (`zeditor`)
 - Google Chrome
 
