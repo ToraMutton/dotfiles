@@ -66,4 +66,10 @@ fi
 
 alias zenn-preview='npx zenn preview --host 0.0.0.0'
 alias zed="zeditor"
-export PATH=$PATH:/opt/rocm/bin
+
+# Load optional machine-specific Bash settings.
+_dotfiles_machine_bashrc="$HOME/.config/bash/machines/$(hostname).bashrc"
+if [[ -r "$_dotfiles_machine_bashrc" ]]; then
+    source "$_dotfiles_machine_bashrc"
+fi
+unset _dotfiles_machine_bashrc
