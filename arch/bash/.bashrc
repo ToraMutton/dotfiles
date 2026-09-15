@@ -68,7 +68,7 @@ alias zenn-preview='npx zenn preview --host 0.0.0.0'
 alias zed="zeditor"
 
 # Load optional machine-specific Bash settings.
-_dotfiles_machine_bashrc="$HOME/.config/bash/machines/$(hostname).bashrc"
+_dotfiles_machine_bashrc="$HOME/.config/bash/machines/$(uname -n).bashrc"
 if [[ -r "$_dotfiles_machine_bashrc" ]]; then
     source "$_dotfiles_machine_bashrc"
 fi

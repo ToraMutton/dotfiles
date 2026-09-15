@@ -42,7 +42,7 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_dir="$(cd -- "$script_dir/.." && pwd -P)"
 stow_dir="$repo_dir/arch"
 profiles_dir="$repo_dir/profiles/arch"
-host="$(hostname -s)"
+host="$(uname -n)"
 
 common_profile="$profiles_dir/common.txt"
 host_profile="$profiles_dir/$host.txt"
