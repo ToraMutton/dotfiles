@@ -340,10 +340,6 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   │
 │   ├── mozc/
 │   │
-│   ├── waybar/
-│   │
-│   └── wlogout/
-│   │
 │
 ├── windows/
 │   ├── glazewm/
@@ -356,9 +352,7 @@ arch/hypr/.config/hypr/lua/autostart.lua
 └── README.md
 ```
 
-Waybar / Wlogout の設定は過去の構成として残していますが、**現在の Arch セッション UI の中心は Caelestia Shell** です。
-
-Clipboard history selectorには、Caelestia CLIの依存として導入されるFuzzelを利用します。
+Clipboard history selector には、Caelestia CLIの依存として導入されるFuzzelを利用します。
 
 ---
 

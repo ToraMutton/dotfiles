@@ -1,1 +1,0 @@
-{ "label": "suspend", "action": "systemctl suspend", "text": "\nSleep", "keybind": "u" }
