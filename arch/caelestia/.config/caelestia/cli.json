@@ -5,7 +5,7 @@
         "enableDiscord": false,
         "enableSpicetify": false,
         "enablePandora": false,
-        "enableFuzzel": false,
+        "enableFuzzel": true,
         "enableBtop": false,
         "enableNvtop": false,
         "enableHtop": false,

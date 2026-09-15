@@ -62,7 +62,7 @@ hl.bind(
 hl.bind(
     mainMod .. " + SHIFT + V",
     hl.dsp.exec_cmd(
-        "cliphist list | wofi --dmenu | cliphist decode | wl-copy"
+        "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
     )
 )
 

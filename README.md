@@ -342,9 +342,8 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   │
 │   ├── waybar/
 │   │
-│   ├── wlogout/
+│   └── wlogout/
 │   │
-│   └── wofi/
 │
 ├── windows/
 │   ├── glazewm/
@@ -359,7 +358,7 @@ arch/hypr/.config/hypr/lua/autostart.lua
 
 Waybar / Wlogout の設定は過去の構成として残していますが、**現在の Arch セッション UI の中心は Caelestia Shell** です。
 
-Wofi は Caelestia Launcher の代替としてではなく、clipboard history selector から現在も利用しています。
+Clipboard history selectorには、Caelestia CLIの依存として導入されるFuzzelを利用します。
 
 ---
 
@@ -386,8 +385,7 @@ stow -d ~/dotfiles/arch -t ~ --simulate \
   caelestia \
   fcitx5 \
   kitty \
-  mimeapps \
-  wofi
+  mimeapps
 ```
 
 ## Apply
@@ -400,8 +398,7 @@ stow -d ~/dotfiles/arch -t ~ \
   caelestia \
   fcitx5 \
   kitty \
-  mimeapps \
-  wofi
+  mimeapps
 ```
 
 新しいファイルやディレクトリを Stow package 側へ追加した場合は、必要に応じて restow します。
@@ -504,7 +501,7 @@ Git の commit / push は現在すべて手動で行っています。
 - `wl-copy`
 - `wl-paste`
 - `cliphist`
-- Wofi
+- Fuzzel
 
 ### Audio / Media
 
