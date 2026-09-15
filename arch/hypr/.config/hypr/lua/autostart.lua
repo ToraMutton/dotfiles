@@ -32,6 +32,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("~/scripts/discord-ipc-link.sh")
 
     -- Clipboard history
-    hl.exec_cmd("wl-paste --type text --watch cliphist store")
-    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+    hl.exec_cmd("wl-paste --type text --watch cliphist -max-items 20 store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist -max-items 20 store")
 end)
