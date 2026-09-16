@@ -111,8 +111,8 @@
         "vimKeybinds": true
     },
     "lock": {
-    "enableFprint": true,
-    "maxFprintTries": 3
+        "enableFprint": true,
+        "maxFprintTries": 3
     },
     "paths": {
         "sessionGif": "~/.config/caelestia/assets/session/spinningcat.gif"
@@ -144,9 +144,38 @@
                 "id": "dnd"
             },
             {
-                "enabled": false,
+                "enabled": true,
                 "id": "vpn"
             }
-        ]
+        ],
+        "vpn": {
+            "enabled": false,
+            "provider": [
+                {
+                    "connectCmd": [
+                        "foot",
+                        "-e",
+                        "nmcli",
+                        "--ask",
+                        "--wait",
+                        "60",
+                        "connection",
+                        "up",
+                        "UEC-VPN"
+                    ],
+                    "disconnectCmd": [
+                        "nmcli",
+                        "connection",
+                        "down",
+                        "UEC-VPN"
+                    ],
+                    "displayName": "UEC VPN",
+                    "id": "vpn-mu3pv9ga-2w85b",
+                    "interface": "ppp0",
+                    "name": "uec-vpn"
+                }
+            ],
+            "selectedProvider": "vpn-mu3pv9ga-2w85b"
+        }
     }
 }
