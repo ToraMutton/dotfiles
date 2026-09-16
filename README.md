@@ -329,7 +329,8 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   ├── kitty/
 │   ├── mimeapps/
 │   ├── nautilus/
-│   └── nautilus-rigel-14/
+│   ├── nautilus-rigel-14/
+│   └── zed/
 │
 ├── profiles/
 │   └── arch/
@@ -344,7 +345,6 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   ├── glazewm/
 │   └── zebar/
 │
-├── zed/
 ├── .gitattributes
 ├── .gitignore
 └── README.md
@@ -625,7 +625,7 @@ Windows 側のファイルは GNU Stow の対象ではありません。
 
 # Zed
 
-`zed/` には Zed の設定を保存しています。
+`arch/zed/.config/zed/` には Zed の設定を保存しています。
 
 主な内容:
 

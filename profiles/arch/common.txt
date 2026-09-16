@@ -8,3 +8,4 @@ hypr
 kitty
 mimeapps
 nautilus
+zed
