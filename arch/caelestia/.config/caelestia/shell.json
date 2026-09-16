@@ -149,14 +149,11 @@
             }
         ],
         "vpn": {
-            "enabled": false,
+            "enabled": true,
             "provider": [
                 {
                     "connectCmd": [
-                        "foot",
-                        "-e",
                         "nmcli",
-                        "--ask",
                         "--wait",
                         "60",
                         "connection",
