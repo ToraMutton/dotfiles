@@ -625,18 +625,11 @@ Windows 側のファイルは GNU Stow の対象ではありません。
 
 # Zed
 
-`arch/zed/.config/zed/` には Zed の設定を保存しています。
+`arch/zed/.config/zed/keymap.json` では、Zed のカスタムキーマップのみを管理しています。
 
-主な内容:
+`settings.json` は、SSH 接続先のプロジェクトパスなど端末固有の情報を Zed が自動的に書き込むため、repository では管理していません。各端末の `~/.config/zed/settings.json` にローカルファイルとして保存します。
 
-- Vim mode
-- Custom keymap
-- Format on save
-- Language-specific settings
-- Edit predictions
-- UEC server 向け SSH connection entries
-
-SSH host definition や credentials 自体はこの repository では管理していません。
+SSH host definition、credentials、remote project paths もこの repository では管理していません。
 
 ---
 
