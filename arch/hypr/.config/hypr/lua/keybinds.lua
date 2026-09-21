@@ -269,7 +269,7 @@ hl.bind(
     )
 )
 
--- Region screenshot -> edit with Swappy
+-- Region screenshot -> edit with Satty
 hl.bind(
     mainMod .. " + SHIFT + S",
     hl.dsp.exec_cmd(

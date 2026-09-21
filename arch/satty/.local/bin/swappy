@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+original_args=("$@")
+input=""
+
+# Caelestia calls: swappy -f <file-or-stdin>
+while (( $# > 0 )); do
+    case "$1" in
+        -f|--file)
+            (( $# >= 2 )) || {
+                printf 'swappy shim: %s requires a filename\n' "$1" >&2
+                exit 2
+            }
+            input="$2"
+            shift 2
+            ;;
+        -f?*)
+            input="${1#-f}"
+            shift
+            ;;
+        *)
+            # Preserve ordinary Swappy usage outside Caelestia.
+            exec /usr/bin/swappy "${original_args[@]}"
+            ;;
+    esac
+done
+
+# Fall back safely if Satty is unavailable or the invocation is unexpected.
+if [[ -z "$input" ]] || ! command -v satty >/dev/null 2>&1; then
+    exec /usr/bin/swappy "${original_args[@]}"
+fi
+
+mkdir -p "$HOME/Pictures/Screenshots"
+
+exec satty --filename "$input"

@@ -1,0 +1,35 @@
+[general]
+fullscreen = "current-screen"
+resize = { mode = "smart" }
+floating-hack = true
+
+initial-tool = "arrow"
+annotation-size-factor = 2
+corner-roundness = 12
+brush-smooth-history-size = 5
+
+copy-command = "wl-copy"
+output-filename = "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
+save-after-copy = false
+
+# Ctrl+CまたはCtrl+Sで処理を完了して閉じる
+early-exit = ["copy", "save"]
+
+# Enterでクリップボードへコピーして閉じる
+actions-on-enter = ["save-to-clipboard", "exit"]
+actions-on-escape = ["exit"]
+
+no-window-decoration = true
+
+[color-palette]
+palette = [
+    "#8ec2e2ff",
+    "#cba6f7ff",
+    "#f38ba8ff",
+    "#a6e3a1ff",
+    "#f9e2afff",
+    "#ffffffff",
+    "#000000ff",
+]
+
+custom = []
