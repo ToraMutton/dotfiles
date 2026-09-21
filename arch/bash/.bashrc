@@ -7,7 +7,27 @@
 
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-PS1='[\u@\h \W]\$ '
+# Username: white
+PS1='\[\e[0m\e[38;2;230;233;239m\]'
+PS1+='\[\e[48;2;230;233;239m\e[38;2;37;40;50m\] \u '
+
+# Gray accent → blue
+PS1+='\[\e[48;2;174;181;193m\e[38;2;230;233;239m\]'
+PS1+='\[\e[48;2;142;194;226m\e[38;2;174;181;193m\]'
+
+# Hostname: blue
+PS1+='\[\e[38;2;37;40;50m\] @\h '
+
+# Directory: charcoal
+PS1+='\[\e[48;2;55;60;72m\e[38;2;142;194;226m\]'
+PS1+='\[\e[38;2;230;233;239m\]  \w '
+
+# Arrow end
+PS1+='\[\e[49m\e[38;2;55;60;72m\]\[\e[0m\]'
+
+# Input line
+PS1+='\n\[\e[38;2;142;194;226m\]❯\[\e[0m\] '
+
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 # ===== UEC Server SSHFS Settings =====

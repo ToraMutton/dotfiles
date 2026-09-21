@@ -2,7 +2,7 @@
 -- Program definitions
 -- =============================================================================
 
-local terminal = "kitty"
+local terminal = "ghostty"
 local fileManager = "nautilus"
 local editor = "zeditor"
 local mainMod = "SUPER"
