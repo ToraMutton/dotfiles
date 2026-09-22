@@ -317,6 +317,7 @@ arch/hypr/.config/hypr/lua/autostart.lua
 ```text
 .
 ├── arch/                         # GNU Stow packages
+│   ├── ai-agents/
 │   ├── bash/
 │   ├── bash-trapezium-08/
 │   ├── caelestia/

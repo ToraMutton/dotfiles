@@ -1,4 +1,5 @@
 # Shared Arch Linux Stow packages
+ai-agents
 bash
 caelestia
 fastfetch
