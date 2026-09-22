@@ -26,7 +26,8 @@ hl.env("NIXOS_OZONE_WL", "1")
 hl.on("hyprland.start", function()
     -- Desktop components
     hl.exec_cmd(
-        'env PATH="$HOME/.local/bin:$PATH" caelestia shell -d'
+        '/usr/bin/env QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=gtk3 ' ..
+        'PATH="$HOME/.local/bin:$PATH" caelestia shell -d'
     )
     hl.exec_cmd("fcitx5 -d")
 
