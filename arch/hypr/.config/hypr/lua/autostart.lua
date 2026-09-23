@@ -9,6 +9,8 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- Japanese input (fcitx5) and Firefox Wayland support
 hl.env("XMODIFIERS", "@im=fcitx")
 hl.env("QT_IM_MODULE", "fcitx")
+-- Keep Qt icon lookup on the GTK icon theme, including manually restarted shells.
+hl.env("QT_QPA_PLATFORMTHEME", "gtk3")
 -- hl.env("GTK_IM_MODULE", "fcitx")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 
