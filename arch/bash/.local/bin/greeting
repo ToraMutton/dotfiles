@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# Shell startup summary: one status line, plus one line per thing that needs attention.
+# Kept cheap (≈10ms): everything except git and df comes from bash builtins or /proc, /sys.
+
+[[ -t 1 && ${TERM:-dumb} != dumb ]] || exit 0
+
+dotfiles_dir=${DOTFILES_DIR:-$HOME/dotfiles}
+disk_warn_percent=85
+battery_warn_percent=20
+
+# ----- Colours -----
+
+accent='' warn='' dim='' reset=''
+palette="$HOME/.config/bash/palette.bash"
+if [[ -z ${NO_COLOR:-} && -r $palette ]]; then
+    source "$palette"
+    accent=$'\e[38;2;'"${palette_blue}m"
+    warn=$'\e[38;2;'"${palette_amber}m"
+    dim=$'\e[38;2;'"${palette_gray}m"
+    reset=$'\e[0m'
+fi
+
+# ----- Status line -----
+
+host=${HOSTNAME%%.*}
+printf -v now '%(%-m/%-d (%a) %H:%M)T' -1
+
+read -r up_seconds _ < /proc/uptime
+up_seconds=${up_seconds%.*}
+days=$(( up_seconds / 86400 ))
+hours=$(( up_seconds % 86400 / 3600 ))
+minutes=$(( up_seconds % 3600 / 60 ))
+if (( days > 0 )); then
+    uptime="up ${days}d ${hours}h"
+elif (( hours > 0 )); then
+    uptime="up ${hours}h ${minutes}m"
+else
+    uptime="up ${minutes}m"
+fi
+
+battery=''
+for bat in /sys/class/power_supply/BAT*; do
+    [[ -r $bat/capacity ]] || continue
+    read -r capacity < "$bat/capacity"
+    read -r bat_status < "$bat/status"
+    if [[ $bat_status == Discharging ]] && (( capacity <= battery_warn_percent )); then
+        battery="${warn}bat ${capacity}%${reset}"
+    else
+        battery="${dim}bat${reset} ${capacity}%"
+    fi
+    break
+done
+
+# stdin is the terminal here; $COLUMNS is not exported to child processes.
+read -r _ columns < <(stty size 2>/dev/null)
+(( columns > 0 )) || columns=80  # unknown size reports 0
+
+# Left column width, so attention labels line up under the hostname.
+label_width=$(( ${#host} > 8 ? ${#host} : 8 ))
+
+if (( columns < 50 )); then
+    printf ' %s%s%s  %s\n' "$accent" "$host" "$reset" "$now"
+    exit 0
+fi
+
+printf ' %s%-*s%s  %s  %s%s%s%s\n' \
+    "$accent" "$label_width" "$host" "$reset" \
+    "$now" \
+    "$dim" "$uptime" "$reset" \
+    "${battery:+  $battery}"
+
+# ----- Attention lines (only when something is off) -----
+
+attention() {
+    printf ' %s%-*s%s  %s\n' "$warn" "$label_width" "$1" "$reset" "$2"
+}
+
+# One git call: porcelain v2 gives both the change list and ahead/behind counts.
+if [[ -d $dotfiles_dir/.git ]]; then
+    changes=0 ahead=0 behind=0 upstream=''
+    while read -r kind rest; do
+        case $kind in
+            '#')
+                read -r key a b <<< "$rest"
+                case $key in
+                    branch.upstream) upstream=$a ;;
+                    branch.ab) ahead=${a#+} behind=${b#-} ;;
+                esac
+                ;;
+            *) (( changes++ )) ;;
+        esac
+    done < <(git -C "$dotfiles_dir" status --porcelain=v2 --branch 2>/dev/null)
+
+    notes=()
+    (( changes > 0 )) && notes+=("$changes uncommitted")
+    (( ahead > 0 )) && notes+=("$ahead ahead of $upstream")
+    (( behind > 0 )) && notes+=("$behind behind $upstream")
+    if (( ${#notes[@]} > 0 )); then
+        printf -v joined '%s · ' "${notes[@]}"
+        attention dotfiles "${joined% · }"
+    fi
+fi
+
+# First line is the "Use%" header; the second is e.g. " 91%".
+{ read -r _; read -r disk_percent; } < <(df --output=pcent / 2>/dev/null)
+disk_percent=${disk_percent%\%}
+if [[ -n $disk_percent ]] && (( disk_percent >= disk_warn_percent )); then
+    attention disk "/ ${disk_percent}% used"
+fi
