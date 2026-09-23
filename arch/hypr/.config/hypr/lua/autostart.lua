@@ -25,9 +25,13 @@ hl.env("NIXOS_OZONE_WL", "1")
 
 hl.on("hyprland.start", function()
     -- Desktop components
+    -- Re-sync the ai-usage overlay (~/.config/quickshell/caelestia) with the
+    -- installed caelestia-shell before starting it, so package upgrades are
+    -- picked up at login. If the sync fails the previous overlay is kept.
     hl.exec_cmd(
         '/usr/bin/env QT_QPA_PLATFORM=wayland QT_QPA_PLATFORMTHEME=gtk3 ' ..
-        'PATH="$HOME/.local/bin:$PATH" caelestia shell -d'
+        'PATH="$HOME/.local/bin:$PATH" sh -c ' ..
+        '"$HOME/Projects/caelestia-ai-usage/install.sh >/dev/null 2>&1; caelestia shell -d"'
     )
     hl.exec_cmd("fcitx5 -d")
 
