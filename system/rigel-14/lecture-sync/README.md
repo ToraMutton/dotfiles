@@ -13,7 +13,7 @@
    chmod 600 ~/.config/rclone-lecture-sync/rclone.conf
    ```
 
-   新しい remote 名は `rigel14_lectures`、種類は `drive`、スコープは読み書き可能な `drive` にする。Advanced config の `root_folder_id` には大学用 `B2` の **親フォルダ ID** を入力する。認証時には目的の Google アカウントを選ぶ。認証情報や設定ファイルを dotfiles、Git、同期対象フォルダに置かない。
+   新しい remote 名は `rigel14_lectures`、種類は `drive`、スコープは読み書き可能な `drive` にする。Advanced config の `root_folder_id` には、後期フォルダの親である大学用 **`B2` フォルダの ID** を入力する。認証時には目的の Google アカウントを選ぶ。認証情報や設定ファイルを dotfiles、Git、同期対象フォルダに置かない。
 
    rclone の共有 Google Drive client ID は 2026 年中に廃止予定。長期運用には [rclone の公式手順](https://rclone.org/drive/#making-your-own-client-id) で本人用の OAuth Desktop client を作り、client ID と secret をこの専用設定に入力してブラウザで再認証する。secret はチャットにも Git にも貼らない。Google の OAuth アプリを Testing のままにすると付与が短期で失効するため、公式手順の公開設定も確認する。
 3. 対象を ID と名前で記録し、接続を確認する。`FOLDER_ID` は `後期` 自体の ID、`FOLDER_NAME` は Drive 上の実名を指定する。
@@ -36,6 +36,12 @@
    systemctl --user daemon-reload
    systemctl --user enable --now rigel-14-lecture-sync.timer
    ```
+
+## 共有 client ID から本人専用 ID への切り替え
+
+現在の同期を止めずに Google Cloud 側を準備できる。rclone の [公式手順](https://rclone.org/drive/#making-your-own-client-id) に沿い、プロジェクトを作って Google Drive API を有効にし、OAuth 同意画面を設定する。アプリ名は任意、Audience は `External`、利用者には自分を追加する。Data Access に公式手順の Drive 関連スコープを追加し、公開状態を `In Production` にする。`Testing` では認証が 7 日で失効する。OAuth client の種類は `Desktop app` を選び、資格情報 JSON をダウンロードする。JSON の中身をチャットや Git に貼らない。
+
+資格情報 JSON ができたら、タイマーを一時停止し、Git 管理外にある現在の `rclone.conf` を権限 `600` で退避する。本人専用 client ID と secret を同じ remote に設定し、ブラウザで再認証する。その後、`B2_後期` のフォルダ ID が以前と同じことを確認し、サービスの手動実行が成功してからタイマーを再開する。失敗した場合は退避した `rclone.conf` を戻してタイマーを再開する。同期対象や bisync の履歴は変えない。
 
 ## 保護と確認
 
