@@ -20,6 +20,8 @@ hl.env("LANG", "ja_JP.UTF-8")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
 hl.env("NIXOS_OZONE_WL", "1")
 
+hl.env("SSH_AUTH_SOCK", os.getenv("XDG_RUNTIME_DIR") .. "/ssh-agent.socket")
+
 
 -- =============================================================================
 -- Autostart
