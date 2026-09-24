@@ -12,3 +12,6 @@ arch/fcitx5*/.config/fcitx5/conf/notifications.conf
 arch/mozc*/.config/mozc/*.ipc
 arch/mozc*/.config/mozc/*.lock
 arch/mozc*/.config/mozc/.registry
+
+# Claude Code project-local files
+.claude/
