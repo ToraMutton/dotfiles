@@ -1,6 +1,6 @@
 # ToraMutton's dotfiles
 
-> Personal dotfiles for an Arch Linux + Hyprland + Caelestia desktop and a Windows 11 + GlazeWM desktop.
+> Personal dotfiles for an Arch Linux + Hyprland + Caelestia desktop.
 >
 > Arch configurations are managed with GNU Stow. This repository is a record of my actual environment rather than a drop-in rice for arbitrary machines.
 
@@ -22,7 +22,6 @@ Arch Linux / Hyprland を中心に、普段使っている環境設定を管理�
 | Arch Linux          | Hyprland + Caelestia Shell + Fcitx5 / Mozc |
 | Hyprland config     | Lua                                        |
 | Desktop shell       | Caelestia Shell                            |
-| Windows 11          | GlazeWM + Zebar                            |
 | Editor              | Zed                                        |
 | Dotfiles deployment | GNU Stow                                   |
 
@@ -342,10 +341,6 @@ arch/hypr/.config/hypr/lua/autostart.lua
 ├── scripts/
 │   └── stow-arch
 │
-├── windows/
-│   ├── glazewm/
-│   └── zebar/
-│
 ├── .gitattributes
 ├── .gitignore
 └── README.md
@@ -600,27 +595,7 @@ Wallpaper files はこのリポジトリでは管理していません。
 
 # Windows 11
 
-`windows/` には Windows 側のデスクトップ設定を保存しています。
-
-主な構成:
-
-- GlazeWM
-- Zebar
-- React
-- Vite
-
-```text
-windows/
-├── glazewm/
-└── zebar/
-    └── toratora-bar/
-        ├── ui/
-        └── toratora-widget/
-```
-
-`ui/` には React + Vite の source、`toratora-widget/` には Zebar が使用する build result を保存しています。
-
-Windows 側のファイルは GNU Stow の対象ではありません。
+Windows 11 (GlazeWM + Zebar) の設定は [ToraMutton/windows-dotfiles](https://github.com/ToraMutton/windows-dotfiles) に分離しました。
 
 ---
 
