@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+readonly remote_name='rigel14_lectures'
+readonly rclone_config="$HOME/.config/rclone-lecture-sync/rclone.conf"
+readonly state_dir="$HOME/.local/state/rigel-14-lecture-sync"
+readonly target_file="$state_dir/target.tsv"
+readonly local_dir="$HOME/Documents/B2/後期"
+readonly access_file='.rclone-bisync-access'
+readonly remote_root="${remote_name}:"
+readonly remote_archive="${remote_root}.rclone-bisync-backups-後期"
+readonly local_archive="$state_dir/backups"
+readonly workdir="$state_dir/bisync"
+
+die() {
+    printf 'Error: %s\n' "$*" >&2
+    if [[ -d $state_dir/logs ]]; then
+        printf '%s ERROR %s\n' "$(date -u +%FT%TZ)" "$*" >> "$state_dir/logs/runner.log"
+    fi
+    exit 1
+}
+note() { printf '%s\n' "$*"; }
+
+[[ $(hostname -s) == rigel-14 ]] || die 'This sync is restricted to rigel-14.'
+command -v rclone >/dev/null || die 'rclone is not installed.'
+command -v jq >/dev/null || die 'jq is not installed.'
+
+umask 077
+
+lock() {
+    mkdir -p -- "$state_dir" "$state_dir/logs"
+    exec 9>"$state_dir/lock"
+    flock -n 9 || die 'Another lecture sync is already running.'
+}
+
+load_target() {
+    [[ -f $target_file ]] || die "Target is not configured. Run: $0 set-target FOLDER_ID FOLDER_NAME"
+    IFS=$'\t' read -r folder_id folder_name < "$target_file"
+    [[ $folder_id =~ ^[A-Za-z0-9_-]+$ && -n $folder_name && $folder_name != */* ]] || die 'Invalid target metadata.'
+    remote_dir="${remote_root}${folder_name}"
+}
+
+check_remote() {
+    [[ -f $rclone_config ]] || die "Missing private rclone config: $rclone_config"
+    local listing
+    listing="$(rclone --config "$rclone_config" lsjson "$remote_root" --dirs-only)" || die 'Cannot list Drive. Check authentication and network.'
+    jq -e --arg id "$folder_id" --arg name "$folder_name" \
+        'any(.[]; .ID == $id and .Name == $name and .IsDir == true)' \
+        <<< "$listing" >/dev/null || die 'The selected folder ID is not a direct child of this remote. Check the account and root_folder_id.'
+}
+
+run_bisync() {
+    local stamp="$1"
+    local run_workdir="$2"
+    shift 2
+    rclone --config "$rclone_config" bisync "$local_dir" "$remote_dir" \
+        --workdir "$run_workdir" \
+        --check-access --check-filename "$access_file" \
+        --max-delete 50 \
+        --conflict-resolve none --conflict-loser num \
+        --backup-dir1 "$local_archive/deleted-local" \
+        --backup-dir2 "${remote_archive}/deleted-drive" \
+        --suffix ".$stamp" --suffix-keep-extension \
+        --recover --resilient --create-empty-src-dirs \
+        --retries 2 --low-level-retries 3 --contimeout 15s --timeout 60s \
+        --log-level INFO --log-file "$state_dir/logs/bisync.log" \
+        "$@"
+}
+
+set_target() {
+    [[ $# == 2 ]] || die "Usage: $0 set-target FOLDER_ID FOLDER_NAME"
+    lock
+    [[ ! -e $state_dir/initialized ]] || die 'Already initialized; stop the timer before changing targets.'
+    [[ $1 =~ ^[A-Za-z0-9_-]+$ && -n $2 && $2 != */* && $2 != *$'\t'* && $2 != *$'\n'* ]] || die 'Invalid folder ID or name.'
+    printf '%s\t%s\n' "$1" "$2" > "$target_file"
+    note "Target recorded outside Git: $2 ($1)."
+    note "Configure the dedicated Drive remote '$remote_name' in $rclone_config, rooted at this folder's parent."
+}
+
+initialize() {
+    lock
+    [[ ! -e $state_dir/initialized ]] || die 'Already initialized. Use run for regular sync.'
+    load_target
+    check_remote
+
+    local stamp
+    stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+    local initial="$local_archive/initial-$stamp"
+    mkdir -p -- "$initial/local" "$local_archive/deleted-local" "$workdir"
+    if [[ -d $local_dir ]]; then
+        [[ ! -L $local_dir ]] || die 'Local target is a symlink.'
+        if [[ -n $(find "$local_dir" -type l -print -quit) ]]; then
+            die 'The local tree contains symlinks; resolve them before initial sync.'
+        fi
+        cp -a -- "$local_dir/." "$initial/local/"
+    else
+        mkdir -p -- "$local_dir"
+    fi
+    note "Local snapshot: $initial/local"
+
+    local drive_snapshot="${remote_archive}/initial-$stamp"
+    rclone --config "$rclone_config" mkdir "$drive_snapshot" || die 'Could not create Drive snapshot folder.'
+    rclone --config "$rclone_config" copy "$remote_dir" "$drive_snapshot" --create-empty-src-dirs \
+        --log-level INFO --log-file "$state_dir/logs/bisync.log" || die 'Drive snapshot failed; sync has not started.'
+    note "Drive snapshot: $drive_snapshot"
+
+    printf 'rigel-14 lecture sync access marker\n' > "$local_dir/$access_file"
+    rclone --config "$rclone_config" copyto "$local_dir/$access_file" "$remote_dir/$access_file" || die 'Could not place Drive access marker.'
+
+    note 'Checking the initial merge (dry run)...'
+    run_bisync "$stamp" "$state_dir/dry-run" --resync-mode newer --dry-run || die 'Initial dry run failed; inspect the log.'
+    note 'Starting the initial merge...'
+    run_bisync "$stamp" "$workdir" --resync-mode newer || die 'Initial sync failed; inspect the log. Timer was not enabled.'
+    printf '%s\t%s\n' "$folder_id" "$folder_name" > "$state_dir/initialized"
+    note 'Initial sync completed. The timer can now be enabled.'
+}
+
+run() {
+    lock
+    [[ -f $state_dir/initialized ]] || die 'Initial sync has not completed; timer is intentionally inactive.'
+    load_target
+    cmp -s "$target_file" "$state_dir/initialized" || die 'Target changed after initialization; refusing to sync.'
+    [[ -d $local_dir && ! -L $local_dir ]] || die 'Local folder is missing or is a symlink.'
+    [[ -f $local_dir/$access_file ]] || die 'Local access marker is missing.'
+    check_remote
+    run_bisync "$(date -u +%Y%m%dT%H%M%SZ)" "$workdir"
+}
+
+case "${1:-}" in
+    set-target) shift; set_target "$@" ;;
+    init) [[ $# == 1 ]] || die 'Usage: init'; initialize ;;
+    run) [[ $# == 1 ]] || die 'Usage: run'; run ;;
+    status)
+        [[ $# == 1 ]] || die 'Usage: status'
+        if [[ -f $state_dir/initialized ]]; then note 'Initial sync: complete'; else note 'Initial sync: pending'; fi
+        [[ ! -f $target_file ]] || { load_target; note "Drive folder: $folder_name ($folder_id)"; }
+        note "Local folder: $local_dir"
+        note "Log: $state_dir/logs/bisync.log"
+        ;;
+    *) die "Usage: $0 {set-target FOLDER_ID FOLDER_NAME|init|run|status}" ;;
+esac

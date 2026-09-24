@@ -1,0 +1,11 @@
+[Unit]
+Description=Run B2 lecture sync about every five minutes while logged in
+
+[Timer]
+OnStartupSec=1min
+OnUnitInactiveSec=5min
+AccuracySec=30s
+Unit=rigel-14-lecture-sync.service
+
+[Install]
+WantedBy=timers.target

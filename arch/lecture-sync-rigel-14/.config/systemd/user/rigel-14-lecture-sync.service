@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync B2 second-semester lectures with Google Drive
+Documentation=https://rclone.org/bisync/
+
+[Service]
+Type=oneshot
+ExecStart=%h/dotfiles/scripts/rigel-14-lecture-sync run
+TimeoutStartSec=0
+
