@@ -41,6 +41,8 @@
 
 現在の同期を止めずに Google Cloud 側を準備できる。rclone の [公式手順](https://rclone.org/drive/#making-your-own-client-id) に沿い、プロジェクトを作って Google Drive API を有効にし、OAuth 同意画面を設定する。アプリ名は任意、Audience は `External`、利用者には自分を追加する。Data Access に公式手順の Drive 関連スコープを追加し、公開状態を `In Production` にする。`Testing` では認証が 7 日で失効する。OAuth client の種類は `Desktop app` を選び、資格情報 JSON をダウンロードする。JSON の中身をチャットや Git に貼らない。
 
+Google が外部向けアプリの公開に説明ページを要求する場合は、このリポジトリの `docs/rigel-lecture-sync/` にある公開用ページを使う。内容はアプリの用途とデータの扱いのみで、講義資料や認証情報を含まない。`docs/` だけを GitHub Pages に載せるワークフローを用意してある。本人が変更を commit・push した後、GitHub のこのリポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定し、Actions の `Publish lecture sync information` が成功したことを確認する。公開 URL は `https://toramutton.github.io/dotfiles/rigel-lecture-sync/` と `https://toramutton.github.io/dotfiles/rigel-lecture-sync/privacy.html`。両方をブラウザで開けることを確認してから、Google Auth Platform の Branding で承認済みドメインに `toramutton.github.io` を追加し、ホームページとプライバシーポリシーの URL を入力して保存する。公開ページの維持には、この GitHub Pages 設定とリポジトリが必要。
+
 資格情報 JSON ができたら、タイマーを一時停止し、Git 管理外にある現在の `rclone.conf` を権限 `600` で退避する。本人専用 client ID と secret を同じ remote に設定し、ブラウザで再認証する。その後、`B2_後期` のフォルダ ID が以前と同じことを確認し、サービスの手動実行が成功してからタイマーを再開する。失敗した場合は退避した `rclone.conf` を戻してタイマーを再開する。同期対象や bisync の履歴は変えない。
 
 ## 保護と確認

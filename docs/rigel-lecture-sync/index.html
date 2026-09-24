@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>rigel-lecture-sync</title>
+    <meta name="description" content="個人用の Google Drive 講義資料同期ツールの説明">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main>
+      <h1>rigel-lecture-sync</h1>
+      <p>自分の講義資料を、Linux ノート PC のローカルフォルダと自分の Google Drive の指定フォルダの間で双方向に同期するための個人用ツールです。</p>
+      <p>PC にログインしている間、rclone と systemd のユーザータイマーで定期的に同期します。オフライン中はローカルのファイルを使い、接続が戻った後に同期を再試行します。一般向けのサービスや共有サイトではありません。</p>
+      <h2>Google Drive へのアクセス</h2>
+      <p>既存のファイルも同期するため、Google Drive 全体を読み書きできる OAuth 権限を要求します。実際の同期処理は、本人が設定した講義資料フォルダを対象にします。ファイルの更新や削除も双方向に反映されるため、同期前のバックアップと競合時の保護を設定しています。</p>
+      <p><a href="./privacy.html">プライバシーポリシーとデータの扱い</a></p>
+    </main>
+  </body>
+</html>
