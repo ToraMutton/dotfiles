@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Resolve the Stow symlink so the dotfiles checkout may live anywhere.
+script_path="$(readlink -f -- "${BASH_SOURCE[0]}")"
+package_dir="$(cd -- "$(dirname -- "$script_path")/../.." && pwd -P)"
+exec python3 "$package_dir/fcitx5-theme/theme.py" "$@"

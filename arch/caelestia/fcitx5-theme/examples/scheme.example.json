@@ -1,0 +1,13 @@
+{
+  "mode": "dark",
+  "colours": {
+    "surfaceContainer": "292d38",
+    "onSurface": "f1f1f6",
+    "onSurfaceVariant": "c5c6d0",
+    "primaryContainer": "4b608b",
+    "onPrimaryContainer": "f1f3ff",
+    "outlineVariant": "555b68",
+    "shadow": "000000"
+  }
+}
+

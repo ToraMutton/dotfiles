@@ -1,0 +1,12 @@
+[Unit]
+Description=Sync Fcitx5 Classic UI colours with Caelestia
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/caelestia-fcitx5-theme watch
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

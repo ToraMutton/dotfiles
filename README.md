@@ -319,7 +319,7 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   ├── ai-agents/
 │   ├── bash/
 │   ├── bash-trapezium-08/
-│   ├── caelestia/
+│   ├── caelestia/               # Caelestia 設定と fcitx5-theme/
 │   ├── fastfetch/
 │   ├── fcitx5-rigel-14/
 │   ├── fcitx5-trapezium-08/
@@ -606,6 +606,14 @@ Windows 11 (GlazeWM + Zebar) の設定は [ToraMutton/windows-dotfiles](https://
 `settings.json` は、SSH 接続先のプロジェクトパスなど端末固有の情報を Zed が自動的に書き込むため、repository では管理していません。各端末の `~/.config/zed/settings.json` にローカルファイルとして保存します。
 
 SSH host definition、credentials、remote project paths もこの repository では管理していません。
+
+---
+
+# Fcitx5 × Caelestia
+
+共通 Stow パッケージ `arch/caelestia/` の `fcitx5-theme/` にテーマ生成コード、文書、テストをまとめています。Stow がホームへ配置するのはコマンドと任意のユーザーサービス定義だけです。テーマ本体は Caelestia の配色を使ってユーザー領域に生成します。壁紙、生成済み配色、Mozc の辞書・学習データは Git 管理しません。
+
+新しい環境では Stow 適用後に `caelestia-fcitx5-theme install` と `fcitx5-remote -r` を実行します。配色変更への自動追従を使う場合は、`systemctl --user daemon-reload` の後に `systemctl --user enable --now caelestia-fcitx5-theme.service` を実行します。既にテーマを導入済みの環境では再インストール不要です。詳しい依存関係、復元手順、実機検証結果は [テーマの README](arch/caelestia/fcitx5-theme/README.md) を参照してください。
 
 ---
 

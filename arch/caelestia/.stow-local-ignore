@@ -1,0 +1,3 @@
+# Keep the theme generator and its documentation in Git, not in $HOME.
+^/fcitx5-theme$
+^/\.stow-local-ignore$
