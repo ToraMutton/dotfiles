@@ -15,3 +15,6 @@ arch/mozc*/.config/mozc/.registry
 
 # Claude Code project-local files
 .claude/
+
+# Local, host-specific power incident records and diagnostics
+/document/rigel-14-power/
