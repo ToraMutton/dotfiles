@@ -47,7 +47,7 @@ To follow wallpaper and light/dark scheme changes, run the watcher while your se
 python3 theme.py watch
 ```
 
-The watcher checks the scheme file every two seconds and regenerates only after it changes. It then asks Fcitx5 to reload its configuration with `fcitx5-remote -r`; it does not restart the service. It can be started from a user session launcher or a user service if you want it to run automatically. Keep the project directory in place while using the watcher. If Caelestia is absent, the fallback palette remains usable.
+The watcher checks the scheme file every two seconds and regenerates only after it changes. It then asks an already running Fcitx5 to reload its configuration with `fcitx5-remote --check -r`. The check prevents D-Bus activation before the compositor has started Fcitx5 with its Wayland environment; it does not restart the service. It can be started from a user session launcher or a user service if you want it to run automatically. Keep the project directory in place while using the watcher. If Caelestia is absent, the fallback palette remains usable.
 
 For a temporary user service that lasts until logout, you can run this from the project directory:
 

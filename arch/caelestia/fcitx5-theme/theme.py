@@ -359,7 +359,9 @@ def uninstall() -> None:
 
 def reload_fcitx() -> None:
     if shutil.which("fcitx5-remote"):
-        subprocess.run(["fcitx5-remote", "-r"], check=False, stdout=subprocess.DEVNULL,
+        # Resolve the existing D-Bus owner atomically. A plain -r can activate
+        # Fcitx before Hyprland supplies its Wayland session environment.
+        subprocess.run(["fcitx5-remote", "--check", "-r"], check=False, stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL)
 
 
