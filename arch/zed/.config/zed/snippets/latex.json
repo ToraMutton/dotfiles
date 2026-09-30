@@ -1,0 +1,483 @@
+{
+  "Report skeleton": {
+    "prefix": "report",
+    "body": [
+      "\\documentclass[a4paper,11pt]{ltjsarticle}",
+      "",
+      "% ===== Layout =====",
+      "\\usepackage[margin=25mm]{geometry}",
+      "",
+      "% ===== Math =====",
+      "\\usepackage{amsmath,amssymb,mathtools}",
+      "\\usepackage{bm}",
+      "",
+      "% ===== Figures / tables =====",
+      "\\usepackage{graphicx}",
+      "\\usepackage{booktabs}",
+      "\\usepackage{tabularx}",
+      "\\usepackage{multirow}",
+      "\\usepackage{float}",
+      "\\usepackage{subcaption}",
+      "\\usepackage{placeins}",
+      "\\graphicspath{{figures/}}",
+      "",
+      "% ===== Units =====",
+      "\\usepackage{siunitx}",
+      "\\sisetup{",
+      "  separate-uncertainty = true,",
+      "  per-mode = symbol,",
+      "}",
+      "",
+      "% ===== Lists =====",
+      "\\usepackage{enumitem}",
+      "",
+      "% ===== URLs / references =====",
+      "\\usepackage{xurl}",
+      "\\usepackage[hidelinks]{hyperref}",
+      "",
+      "% ===== Source code =====",
+      "\\usepackage{xcolor}",
+      "\\usepackage{listings}",
+      "\\lstset{",
+      "  basicstyle=\\ttfamily\\small,",
+      "  breaklines=true,",
+      "  frame=single,",
+      "  numbers=left,",
+      "  numberstyle=\\scriptsize,",
+      "  columns=fullflexible,",
+      "  keepspaces=true,",
+      "  showstringspaces=false,",
+      "}",
+      "",
+      "% ===== Handy math commands =====",
+      "\\newcommand{\\N}{\\mathbb{N}}",
+      "\\newcommand{\\Z}{\\mathbb{Z}}",
+      "\\newcommand{\\Q}{\\mathbb{Q}}",
+      "\\newcommand{\\R}{\\mathbb{R}}",
+      "\\newcommand{\\C}{\\mathbb{C}}",
+      "",
+      "\\title{${1:レポートタイトル}}",
+      "\\author{${2:所属}\\\\${3:学籍番号} ${4:氏名}}",
+      "\\date{\\today}",
+      "",
+      "\\begin{document}",
+      "\\maketitle",
+      "",
+      "\\section{${5:はじめに}}",
+      "$0",
+      "",
+      "\\end{document}"
+    ],
+    "description": "LuaLaTeX + ltjsarticle の汎用大学レポート一式"
+  },
+  "Lab report skeleton": {
+    "prefix": "labreport",
+    "body": [
+      "\\documentclass[a4paper,11pt]{ltjsarticle}",
+      "",
+      "% ===== Layout =====",
+      "\\usepackage[margin=25mm]{geometry}",
+      "",
+      "% ===== Math =====",
+      "\\usepackage{amsmath,amssymb,mathtools}",
+      "\\usepackage{bm}",
+      "",
+      "% ===== Figures / tables =====",
+      "\\usepackage{graphicx}",
+      "\\usepackage{booktabs}",
+      "\\usepackage{tabularx}",
+      "\\usepackage{multirow}",
+      "\\usepackage{float}",
+      "\\usepackage{subcaption}",
+      "\\usepackage{placeins}",
+      "\\graphicspath{{figures/}}",
+      "",
+      "% ===== Units =====",
+      "\\usepackage{siunitx}",
+      "\\sisetup{",
+      "  separate-uncertainty = true,",
+      "  per-mode = symbol,",
+      "}",
+      "",
+      "% ===== Lists =====",
+      "\\usepackage{enumitem}",
+      "",
+      "% ===== URLs / references =====",
+      "\\usepackage{xurl}",
+      "\\usepackage[hidelinks]{hyperref}",
+      "",
+      "% ===== Source code =====",
+      "\\usepackage{xcolor}",
+      "\\usepackage{listings}",
+      "\\lstset{",
+      "  basicstyle=\\ttfamily\\small,",
+      "  breaklines=true,",
+      "  frame=single,",
+      "  numbers=left,",
+      "  numberstyle=\\scriptsize,",
+      "  columns=fullflexible,",
+      "  keepspaces=true,",
+      "  showstringspaces=false,",
+      "}",
+      "",
+      "% ===== Handy math commands =====",
+      "\\newcommand{\\N}{\\mathbb{N}}",
+      "\\newcommand{\\Z}{\\mathbb{Z}}",
+      "\\newcommand{\\Q}{\\mathbb{Q}}",
+      "\\newcommand{\\R}{\\mathbb{R}}",
+      "\\newcommand{\\C}{\\mathbb{C}}",
+      "",
+      "\\title{${1:レポートタイトル}}",
+      "\\author{${2:所属}\\\\${3:学籍番号} ${4:氏名}}",
+      "\\date{\\today}",
+      "",
+      "\\begin{document}",
+      "\\maketitle",
+      "",
+      "\\section{目的}",
+      "${5:実験の目的を書く。}",
+      "",
+      "\\section{原理}",
+      "${6:理論・原理を書く。}",
+      "",
+      "\\section{装置}",
+      "${7:装置や使用機器を書く。}",
+      "",
+      "\\section{方法}",
+      "${8:実験方法を書く。}",
+      "",
+      "\\section{結果}",
+      "${9:測定結果を書く。}",
+      "",
+      "\\section{考察}",
+      "${10:結果を解釈し、誤差や妥当性を考察する。}",
+      "",
+      "\\section{結論}",
+      "${11:得られた結論を簡潔にまとめる。}",
+      "",
+      "$0",
+      "",
+      "\\end{document}"
+    ],
+    "description": "目的・原理・装置・方法・結果・考察・結論を含む実験レポート"
+  },
+  "Question section": {
+    "prefix": "q",
+    "body": [
+      "\\section*{問${1:1}}",
+      "$0"
+    ],
+    "description": "演習レポートの「問N」セクション"
+  },
+  "Section": {
+    "prefix": "sec",
+    "body": [
+      "\\section{${1:見出し}}",
+      "\\label{sec:${2:label}}",
+      "",
+      "$0"
+    ],
+    "description": "section + label"
+  },
+  "Subsection": {
+    "prefix": "ssec",
+    "body": [
+      "\\subsection{${1:見出し}}",
+      "",
+      "$0"
+    ],
+    "description": "subsection"
+  },
+  "Figure": {
+    "prefix": "fig",
+    "body": [
+      "\\begin{figure}[htbp]",
+      "  \\centering",
+      "  \\includegraphics[width=${1:0.8}\\linewidth]{${2:image.png}}",
+      "  \\caption{${3:キャプション}}",
+      "  \\label{fig:${4:label}}",
+      "\\end{figure}",
+      "$0"
+    ],
+    "description": "画像1枚 + caption + label"
+  },
+  "Two subfigures": {
+    "prefix": "fig2",
+    "body": [
+      "\\begin{figure}[htbp]",
+      "  \\centering",
+      "  \\begin{subfigure}[b]{0.47\\linewidth}",
+      "    \\centering",
+      "    \\includegraphics[width=\\linewidth]{${1:left.png}}",
+      "    \\caption{${2:左}}",
+      "    \\label{fig:${3:left}}",
+      "  \\end{subfigure}",
+      "  \\hfill",
+      "  \\begin{subfigure}[b]{0.47\\linewidth}",
+      "    \\centering",
+      "    \\includegraphics[width=\\linewidth]{${4:right.png}}",
+      "    \\caption{${5:右}}",
+      "    \\label{fig:${6:right}}",
+      "  \\end{subfigure}",
+      "  \\caption{${7:全体のキャプション}}",
+      "  \\label{fig:${8:pair}}",
+      "\\end{figure}",
+      "$0"
+    ],
+    "description": "横並び2画像 + subcaption"
+  },
+  "Table": {
+    "prefix": "tab",
+    "body": [
+      "\\begin{table}[htbp]",
+      "  \\centering",
+      "  \\caption{${1:キャプション}}",
+      "  \\label{tab:${2:label}}",
+      "  \\begin{tabular}{${3:ccc}}",
+      "    \\toprule",
+      "    ${4:項目A} & ${5:項目B} & ${6:項目C} \\\\",
+      "    \\midrule",
+      "    ${7:値A} & ${8:値B} & ${9:値C} \\\\",
+      "    \\bottomrule",
+      "  \\end{tabular}",
+      "\\end{table}",
+      "$0"
+    ],
+    "description": "booktabs を使った基本表"
+  },
+  "TabularX table": {
+    "prefix": "tabx",
+    "body": [
+      "\\begin{table}[htbp]",
+      "  \\centering",
+      "  \\caption{${1:キャプション}}",
+      "  \\label{tab:${2:label}}",
+      "  \\begin{tabularx}{\\linewidth}{${3:lX}}",
+      "    \\toprule",
+      "    ${4:項目} & ${5:説明} \\\\",
+      "    \\midrule",
+      "    ${6:A} & ${7:長い文章} \\\\",
+      "    \\bottomrule",
+      "  \\end{tabularx}",
+      "\\end{table}",
+      "$0"
+    ],
+    "description": "長文セルを自動折り返しする表"
+  },
+  "Equation": {
+    "prefix": "eq",
+    "body": [
+      "\\begin{equation}",
+      "  ${1:E = mc^2}",
+      "  \\label{eq:${2:label}}",
+      "\\end{equation}",
+      "$0"
+    ],
+    "description": "番号付き数式 + label"
+  },
+  "Aligned equation": {
+    "prefix": "eqa",
+    "body": [
+      "\\begin{equation}",
+      "  \\begin{aligned}",
+      "    ${1:a} &= ${2:b} \\\\",
+      "            &= ${3:c}",
+      "  \\end{aligned}",
+      "  \\label{eq:${4:label}}",
+      "\\end{equation}",
+      "$0"
+    ],
+    "description": "複数行だが式番号は1つの数式"
+  },
+  "Align star": {
+    "prefix": "align",
+    "body": [
+      "\\begin{align*}",
+      "  ${1:a} &= ${2:b} \\\\",
+      "          &= ${3:c}",
+      "\\end{align*}",
+      "$0"
+    ],
+    "description": "番号なし複数行数式"
+  },
+  "Numbered align": {
+    "prefix": "aln",
+    "body": [
+      "\\begin{align}",
+      "  ${1:a} &= ${2:b} \\label{eq:${3:first}} \\\\",
+      "          &= ${4:c} \\label{eq:${5:second}}",
+      "\\end{align}",
+      "$0"
+    ],
+    "description": "各行に番号が付く式変形（align）"
+  },
+  "Unnumbered align (short)": {
+    "prefix": "als",
+    "body": [
+      "\\begin{align*}",
+      "  ${1:a} &= ${2:b} \\\\",
+      "          &= ${3:c}",
+      "\\end{align*}",
+      "$0"
+    ],
+    "description": "番号なし式変形（align*、align の短縮別名）"
+  },
+  "Itemize": {
+    "prefix": "item",
+    "body": [
+      "\\begin{itemize}",
+      "  \\item ${1:項目}",
+      "  \\item ${2:項目}",
+      "\\end{itemize}",
+      "$0"
+    ],
+    "description": "箇条書き"
+  },
+  "Enumerate": {
+    "prefix": "enum",
+    "body": [
+      "\\begin{enumerate}[label=(\\arabic*)]",
+      "  \\item ${1:項目}",
+      "  \\item ${2:項目}",
+      "\\end{enumerate}",
+      "$0"
+    ],
+    "description": "(1), (2), ... の番号付きリスト"
+  },
+  "Quantity": {
+    "prefix": "qty",
+    "body": [
+      "\\qty{${1:9.81}}{${2:\\metre\\per\\second\\squared}}$0"
+    ],
+    "description": "siunitx の数量 + 単位"
+  },
+  "Quantity with uncertainty": {
+    "prefix": "qtyu",
+    "body": [
+      "\\qty{${1:9.81} +- ${2:0.02}}{${3:\\metre\\per\\second\\squared}}$0"
+    ],
+    "description": "siunitx の不確かさ付き数量"
+  },
+  "Quantity centimetre": {
+    "prefix": "qcm",
+    "body": [
+      "\\qty{${1:12.3}}{\\centi\\metre}$0"
+    ],
+    "description": "数値と cm をまとめて入力"
+  },
+  "Quantity millimetre": {
+    "prefix": "qmm",
+    "body": [
+      "\\qty{${1:0.2}}{\\milli\\metre}$0"
+    ],
+    "description": "数値と mm をまとめて入力"
+  },
+  "Quantity acceleration": {
+    "prefix": "qacc",
+    "body": [
+      "\\qty{${1:9.81}}{\\metre\\per\\second\\squared}$0"
+    ],
+    "description": "数値と m/s^2 をまとめて入力"
+  },
+  "Figure reference": {
+    "prefix": "figref",
+    "body": [
+      "図~\\ref{fig:${1:label}}$0"
+    ],
+    "description": "図参照"
+  },
+  "Table reference": {
+    "prefix": "tabref",
+    "body": [
+      "表~\\ref{tab:${1:label}}$0"
+    ],
+    "description": "表参照"
+  },
+  "Equation reference": {
+    "prefix": "eqref",
+    "body": [
+      "式~\\eqref{eq:${1:label}}$0"
+    ],
+    "description": "式参照"
+  },
+  "Section reference": {
+    "prefix": "secref",
+    "body": [
+      "第~\\ref{sec:${1:label}}~節$0"
+    ],
+    "description": "節参照"
+  },
+  "Footnote": {
+    "prefix": "fn",
+    "body": [
+      "\\footnote{${1:脚注}}$0"
+    ],
+    "description": "脚注"
+  },
+  "URL": {
+    "prefix": "url",
+    "body": [
+      "\\url{${1:https://example.com/}}$0"
+    ],
+    "description": "URL"
+  },
+  "Hyperlink": {
+    "prefix": "href",
+    "body": [
+      "\\href{${1:https://example.com/}}{${2:リンク名}}$0"
+    ],
+    "description": "表示名付きハイパーリンク"
+  },
+  "Code listing": {
+    "prefix": "code",
+    "body": [
+      "\\begin{lstlisting}[language=${1:C},caption={${2:コード例}}]",
+      "${3:// code}",
+      "\\end{lstlisting}",
+      "$0"
+    ],
+    "description": "listings コードブロック"
+  },
+  "Bibliography": {
+    "prefix": "bib",
+    "body": [
+      "\\begin{thebibliography}{99}",
+      "  \\bibitem{${1:key}}",
+      "  ${2:著者名，\\textit{書名}，出版社，2026．}",
+      "\\end{thebibliography}",
+      "$0"
+    ],
+    "description": "手書き参考文献一覧"
+  },
+  "Bibitem": {
+    "prefix": "bibitem",
+    "body": [
+      "\\bibitem{${1:key}}",
+      "${2:参考文献情報}$0"
+    ],
+    "description": "参考文献1件"
+  },
+  "Cite": {
+    "prefix": "cite",
+    "body": [
+      "\\cite{${1:key}}$0"
+    ],
+    "description": "文献参照"
+  },
+  "Clear page": {
+    "prefix": "cpage",
+    "body": [
+      "\\clearpage",
+      "$0"
+    ],
+    "description": "改ページ + float flush"
+  },
+  "Float barrier": {
+    "prefix": "fbar",
+    "body": [
+      "\\FloatBarrier",
+      "$0"
+    ],
+    "description": "この位置より先へ図表を流さない"
+  }
+}

@@ -601,9 +601,13 @@ Windows 11 (GlazeWM + Zebar) の設定は [ToraMutton/windows-dotfiles](https://
 
 # Zed
 
-`arch/zed/.config/zed/keymap.json` では、Zed のカスタムキーマップのみを管理しています。
+`arch/zed/.config/zed/` の `keymap.json` と `snippets/latex.json` を、共通 Stow パッケージ `zed` で管理しています。
+
+LaTeX は LuaLaTeX + latexmk + texlab + Zathura を使用し、`ltjsarticle` の通常レポート・実験レポート用スニペットを用意しています。式変形は `aln` → `align`（番号付き）、`als` → `align*`（番号なし）で、既存の `align` prefix（番号なし）と siunitx の `\qty` 系も維持しています。
 
 `settings.json` は、SSH 接続先のプロジェクトパスなど端末固有の情報を Zed が自動的に書き込むため、repository では管理していません。各端末の `~/.config/zed/settings.json` にローカルファイルとして保存します。
+
+ローカルで設定する項目は、スニペットを優先表示する `"snippet_sort_order": "top"`、texlab の latexmk ビルド（`-lualatex` / `-synctex=1`）、Zathura への forward search です。必要な依存ツールは各端末で手動導入します。
 
 SSH host definition、credentials、remote project paths もこの repository では管理していません。
 
