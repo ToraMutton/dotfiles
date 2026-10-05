@@ -617,7 +617,7 @@ SSH host definition、credentials、remote project paths もこの repository �
 
 共通 Stow パッケージ `arch/caelestia/` の `fcitx5-theme/` にテーマ生成コード、文書、テストをまとめています。Stow がホームへ配置するのはコマンドと任意のユーザーサービス定義だけです。テーマ本体は Caelestia の配色を使ってユーザー領域に生成します。壁紙、生成済み配色、Mozc の辞書・学習データは Git 管理しません。
 
-新しい環境では Stow 適用後に `caelestia-fcitx5-theme install` と `fcitx5-remote -r` を実行します。配色変更への自動追従を使う場合は、`systemctl --user daemon-reload` の後に `systemctl --user enable --now caelestia-fcitx5-theme.service` を実行します。既にテーマを導入済みの環境では再インストール不要です。詳しい依存関係、復元手順、実機検証結果は [テーマの README](arch/caelestia/fcitx5-theme/README.md) を参照してください。
+新しい環境では Stow 適用後に `caelestia-fcitx5-theme install` を実行し、`busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui` でテーマを反映します（`fcitx5-remote -r` はグローバル設定しか再読込しないため、テーマには効きません）。配色変更への自動追従を使う場合は、`systemctl --user daemon-reload` の後に `systemctl --user enable --now caelestia-fcitx5-theme.service` を実行します。既にテーマを導入済みの環境では再インストール不要です。詳しい依存関係、復元手順、実機検証結果は [テーマの README](arch/caelestia/fcitx5-theme/README.md) を参照してください。
 
 ---
 

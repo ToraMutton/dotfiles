@@ -357,12 +357,17 @@ def uninstall() -> None:
     print("Restored previous theme selection and removed managed theme. Fcitx5 has not been reloaded.")
 
 
+RELOAD_COMMAND = ("busctl", "--user", "--auto-start=no", "call", "org.fcitx.Fcitx5", "/controller",
+                  "org.fcitx.Fcitx.Controller1", "ReloadAddonConfig", "s", "classicui")
+
+
 def reload_fcitx() -> None:
-    if shutil.which("fcitx5-remote"):
-        # Resolve the existing D-Bus owner atomically. A plain -r can activate
-        # Fcitx before Hyprland supplies its Wayland session environment.
-        subprocess.run(["fcitx5-remote", "--check", "-r"], check=False, stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL)
+    if shutil.which("busctl"):
+        # `fcitx5-remote -r` reloads only the global config; Classic UI reads
+        # theme.conf again only when its own addon config is reloaded.
+        # --auto-start=no keeps D-Bus from activating Fcitx before Hyprland
+        # supplies its Wayland session environment.
+        subprocess.run(RELOAD_COMMAND, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def watch(scheme: Path, fallback_mode: str, interval: float) -> None:

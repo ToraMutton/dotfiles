@@ -117,6 +117,14 @@ class ThemeTests(unittest.TestCase):
             theme.uninstall()
         self.assertTrue(theme.theme_path().exists())
 
+    def test_reload_targets_classic_ui_without_activating_fcitx(self):
+        with patch("theme.shutil.which", return_value="/usr/bin/busctl"), \
+                patch("theme.subprocess.run") as run:
+            theme.reload_fcitx()
+        command = run.call_args.args[0]
+        self.assertIn("--auto-start=no", command)
+        self.assertEqual(command[-3:], ("ReloadAddonConfig", "s", "classicui"))
+
 
 if __name__ == "__main__":
     unittest.main()

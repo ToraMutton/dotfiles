@@ -4,23 +4,24 @@
 
 - Read only inspection identified Fcitx5, fcitx5-mozc, Caelestia Shell/CLI, Quickshell, Hyprland, and Qt versions. IBus was not installed. The Fcitx5 profile selects Mozc as the default input method.
 - Caelestia's generated scheme format and watcher were checked against the installed Caelestia files. The generator uses the XDG state location shown there.
-- The theme fields and the reload path were checked against the Fcitx5 5.1.22 Classic UI source. The image assets were generated from fictional sample colours. Six isolated tests passed for fallback, PNG output, readable fallback contrast, reversible config updates, and overwrite protection.
+- The theme fields and the reload path were checked against the Fcitx5 5.1.22 Classic UI source. The image assets were generated from fictional sample colours. Seven isolated tests passed for fallback, PNG output, readable fallback contrast, reversible config updates, overwrite protection, and the Classic UI reload command.
 - The illustrative preview is an RGB PNG with no embedded metadata. Source text and candidate files were scanned for local identifiers, email addresses, home paths, private key markers, and cloud key patterns; no actual private value was found. The example generation directory and Python caches are ignored by Git.
 - After approval, the user-local theme was installed. The previously absent Classic UI config now contains only `Theme=caelestia-mozc` and `DarkTheme=caelestia-mozc`; a private backup and install record exist. The running Fcitx5 accepted a configuration reload, still reported Mozc as the current input method, and the temporary colour watcher was active. Hyprland reported its global blur option enabled.
 - The user visually checked the candidate popup on the live desktop and reported that its appearance was satisfactory. This confirms a visual smoke check, not every interaction or display scenario below.
 - The dotfiles Stow package was checked in an isolated target: it linked only the command and service definition, and the symlinked command generated a theme. The full Arch profile dry-run completed successfully. The same two links were then applied to the live user target. The persistent user service passed `systemd-analyze verify`, is enabled and running, and Fcitx5 still reports Mozc as the current input method.
 - The theme component was moved into the existing `arch/caelestia` Stow package. Both live links were switched after their old targets were checked, and the old package was moved into a private rollback backup outside Git. The full Stow dry-run, command render, and active/enabled service checks passed after the move. The host-specific Fcitx5 packages and input settings were not changed.
+- The original watcher reload (`fcitx5-remote --check -r`) reached Fcitx5 but left the popup colours unchanged until Fcitx5 restarted. In 5.1.22, `ReloadConfig` reloads only the global config, and Classic UI does not react to it. The watcher now calls `ReloadAddonConfig` for `classicui` with D-Bus auto-start disabled; a manual call returned success and Fcitx5 kept running. The user then changed the wallpaper with the watcher running and confirmed that the live candidate popup followed the new colours.
 
 ## Needs a live desktop check after installation
 
 - Japanese conversion, candidate selection by number and click, paging, preedit visibility, and focus in GTK, Qt, and native Wayland apps.
 - Long Japanese and Latin candidates, annotations, and page indicators.
-- Light/dark changes and wallpaper changes while the watcher is running. The watcher is enabled for automatic user-session startup, but this transition has not yet been exercised across a logout/login cycle.
+- Light/dark changes while the watcher is running. Wallpaper changes are verified within a session; the watcher is enabled for automatic user-session startup, but colour changes have not yet been exercised across a logout/login cycle.
 - Actual compositor blur versus transparency, shadow appearance, and contrast with blur disabled.
 - Fractional scale, high DPI, multiple monitors, and different monitor scales.
 - Uninstall on the live desktop and restoration of the previous theme selection.
 
-The initial sandboxed inspection could not connect to Fcitx5 or Hyprland; the approved installation used the live session. Candidate appearance was visually checked by the user. Visible blur as a distinct effect, detailed input interactions, and multi-monitor behaviour are still **unverified**. A generated preview is illustrative and is not evidence of a live candidate popup.
+The initial sandboxed inspection could not connect to Fcitx5 or Hyprland; the approved installation used the live session. Candidate appearance, including a wallpaper colour change, was visually checked by the user. Visible blur as a distinct effect, detailed input interactions, and multi-monitor behaviour are still **unverified**. A generated preview is illustrative and is not evidence of a live candidate popup.
 
 ## Publication scan
 

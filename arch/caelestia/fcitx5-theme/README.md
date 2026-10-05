@@ -37,7 +37,7 @@ Review the exact changes below before running `install`:
 python3 theme.py install
 ```
 
-The installer does not restart or reload Fcitx5. When you are ready, apply the new theme with `fcitx5-remote -r` or through the Fcitx5 configuration UI. If the config file was absent, the installer creates it. If any installation destination already exists, it stops without overwriting it.
+The installer does not restart or reload Fcitx5. When you are ready, apply the new theme with `busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui` or through the Fcitx5 configuration UI. `fcitx5-remote -r` is not enough: it reloads only the global config, not Classic UI. If the config file was absent, the installer creates it. If any installation destination already exists, it stops without overwriting it.
 
 This theme applies when Fcitx5 is using Classic UI. If a different UI frontend such as Kimpanel is active, switch that frontend through your Fcitx5 configuration before expecting the appearance to change; this installer does not change the active UI frontend.
 
@@ -47,7 +47,7 @@ To follow wallpaper and light/dark scheme changes, run the watcher while your se
 python3 theme.py watch
 ```
 
-The watcher checks the scheme file every two seconds and regenerates only after it changes. It then asks an already running Fcitx5 to reload its configuration with `fcitx5-remote --check -r`. The check prevents D-Bus activation before the compositor has started Fcitx5 with its Wayland environment; it does not restart the service. It can be started from a user session launcher or a user service if you want it to run automatically. Keep the project directory in place while using the watcher. If Caelestia is absent, the fallback palette remains usable.
+The watcher checks the scheme file every two seconds and regenerates only after it changes. It then asks an already running Fcitx5 to reload the Classic UI addon config over D-Bus (`ReloadAddonConfig classicui` via `busctl --auto-start=no`). Disabling auto-start prevents D-Bus activation before the compositor has started Fcitx5 with its Wayland environment; it does not restart the service. It can be started from a user session launcher or a user service if you want it to run automatically. Keep the project directory in place while using the watcher. If Caelestia is absent, the fallback palette remains usable.
 
 For a temporary user service that lasts until logout, you can run this from the project directory:
 
@@ -65,7 +65,7 @@ Stop the watcher (`Ctrl+C` in its terminal, or the `systemctl --user stop` comma
 
 ```sh
 python3 theme.py uninstall
-fcitx5-remote -r
+busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui
 ```
 
 Uninstall restores the two previous theme choices, preserves other later config edits, removes only its own theme directory, and deletes its private backup and install record. If you changed either theme choice after installation, uninstall stops rather than replacing that change. The saved `classicui.conf.before-install` is available for manual recovery. For immediate manual rollback, select your previous Classic UI theme in `fcitx5-configtool` and reload Fcitx5.
