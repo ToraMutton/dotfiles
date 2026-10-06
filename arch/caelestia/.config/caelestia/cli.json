@@ -1,4 +1,7 @@
 {
+    "record": {
+        "extraArgs": ["-f", "60", "-fm", "cfr"]
+    },
     "theme": {
         "enableHypr": true,
         "enableTerm": false,
