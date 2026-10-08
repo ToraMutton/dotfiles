@@ -287,7 +287,7 @@ hl.bind(
 
 hl.bind(
     mainMod .. " + R",
-    hl.dsp.exec_cmd("caelestia record")
+    hl.dsp.exec_cmd('PATH="$HOME/.local/bin:$PATH" caelestia record')
 )
 
 -- =============================================================================

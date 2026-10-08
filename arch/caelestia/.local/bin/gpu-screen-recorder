@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Caelestia adds the monitor's FPS before record.extraArgs. GSR rejects
+# duplicate -f options, so keep the final (configured) value only.
+original_args=("$@")
+args=()
+fps=()
+
+while (( $# > 0 )); do
+    case "$1" in
+        -f)
+            # Let GSR report malformed arguments without changing them.
+            if (( $# < 2 )); then
+                exec /usr/bin/gpu-screen-recorder "${original_args[@]}"
+            fi
+            fps=("-f" "$2")
+            shift 2
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+
+exec /usr/bin/gpu-screen-recorder "${args[@]}" "${fps[@]}"
