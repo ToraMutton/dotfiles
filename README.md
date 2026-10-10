@@ -619,6 +619,8 @@ SSH host definition、credentials、remote project paths もこの repository �
 
 新しい環境では Stow 適用後に `caelestia-fcitx5-theme install` を実行し、`busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui` でテーマを反映します（`fcitx5-remote -r` はグローバル設定しか再読込しないため、テーマには効きません）。配色変更への自動追従を使う場合は、`systemctl --user daemon-reload` の後に `systemctl --user enable --now caelestia-fcitx5-theme.service` を実行します。既にテーマを導入済みの環境では再インストール不要です。詳しい依存関係、復元手順、実機検証結果は [テーマの README](arch/caelestia/fcitx5-theme/README.md) を参照してください。
 
+`rigel-14` では日本語入力に [Meltype](https://github.com/yksr-melt/Meltype) を既定にし、Mozc を予備として残しています。Meltype の fcitx5 アドオンは、候補の縦並びとページ送りを直したものを `system/meltype-fcitx5/build.sh` でビルドし直して使います。キー操作と更新時の手順は [system/meltype-fcitx5/README.md](system/meltype-fcitx5/README.md) を参照してください。
+
 ---
 
 # Philosophy

@@ -8,14 +8,17 @@ DeactivateKeys=
 # 前の入力メソッドに切り替える
 # EnumerateBackwardKeys=
 # 切り替え時は第1入力メソッドをスキップする
-# EnumerateSkipFirst=False
+EnumerateSkipFirst=True
 # 修飾キーのショートカットをトリガーするための時間制限（ミリ秒）
 ModifierOnlyKeyTimeout=264
 
-# [Hotkey/TriggerKeys]
-# 0=Control+space
-# 1=Zenkaku_Hankaku
-# 2=Hangul
+# 半角/全角 は Meltype 自身の英数⇔日本語切り替えに渡す
+[Hotkey/TriggerKeys]
+0=Control+space
+
+# 予備の Mozc と Meltype を切り替える（keyboard-jp は飛ばす）
+[Hotkey/EnumerateForwardKeys]
+0=Control+Henkan
 
 [Hotkey/ActivateKeys]
 0=Henkan
@@ -79,3 +82,4 @@ ModifierOnlyKeyTimeout=264
 # ShowPreeditForPassword=False
 # ユーザーデータを保存する間隔（分）
 # AutoSavePeriod=30
+

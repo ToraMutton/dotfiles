@@ -1,0 +1,45 @@
+diff --git a/linux/fcitx5/CMakeLists.txt b/linux/fcitx5/CMakeLists.txt
+index a942fa4..57c44b0 100644
+--- a/linux/fcitx5/CMakeLists.txt
++++ b/linux/fcitx5/CMakeLists.txt
+@@ -13,7 +13,7 @@ find_package(Fcitx5Utils 5.0 REQUIRED)
+ set(MELTYPE_DIR "/opt/meltype" CACHE PATH "libMeltypeNative.so を入れた場所")
+ 
+ add_library(meltype MODULE meltype.cpp)
+-set_target_properties(meltype PROPERTIES PREFIX "" CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
++set_target_properties(meltype PROPERTIES PREFIX "" CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+ target_compile_definitions(meltype PRIVATE MELTYPE_DIR="${MELTYPE_DIR}")
+ target_link_libraries(meltype PRIVATE Fcitx5::Core Fcitx5::Utils ${CMAKE_DL_LIBS})
+ 
+@@ -35,7 +35,7 @@ if(BUILD_TESTING)
+     get_target_property(FCITX5_CORE_LOCATION Fcitx5::Core LOCATION)
+     get_filename_component(FCITX5_LIB_DIR ${FCITX5_CORE_LOCATION} DIRECTORY)
+     add_executable(testmeltype test/testmeltype.cpp)
+-    set_target_properties(testmeltype PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
++    set_target_properties(testmeltype PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+     target_compile_definitions(testmeltype PRIVATE
+         FCITX5_MELTYPE_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+         FCITX5_SYSTEM_ADDON_DIR="${FCITX5_LIB_DIR}/fcitx5")
+diff --git a/linux/fcitx5/meltype.cpp b/linux/fcitx5/meltype.cpp
+index f047b1f..16bfd69 100644
+--- a/linux/fcitx5/meltype.cpp
++++ b/linux/fcitx5/meltype.cpp
+@@ -494,11 +494,17 @@ private:
+         if (converting && candidates.size() > 1) {
+             auto list = std::make_unique<fcitx::CommonCandidateList>();
+             list->setPageSize(9);
++            // Mozc と同じく縦に並べる (指定しないと Classic UI の既定の横一列になる)
++            list->setLayoutHint(fcitx::CandidateLayoutHint::Vertical);
+             list->setLabels({"1. ", "2. ", "3. ", "4. ", "5. ", "6. ", "7. ", "8. ", "9. "});
+             list->setCursorPositionAfterPaging(fcitx::CursorPositionAfterPaging::DonotChange);
+             for (size_t i = 0; i < candidates.size(); i++) list->append<MeltypeCandidate>(this, candidates[i], static_cast<int>(i));
+             int selected = view.integer("selectedIndex", 0);
+-            if (selected >= 0 && selected < static_cast<int>(candidates.size())) list->setGlobalCursorIndex(selected);
++            if (selected >= 0 && selected < static_cast<int>(candidates.size())) {
++                // 選んでいる候補のあるページを表示する (カーソルだけ動かすと 1 ページ目のままになる)
++                list->setPage(selected / 9);
++                list->setGlobalCursorIndex(selected);
++            }
+             panel.setCandidateList(std::move(list));
+         }
+         ic->updatePreedit();
