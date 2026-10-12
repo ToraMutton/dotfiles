@@ -126,6 +126,21 @@ run() {
     run_bisync "$(date -u +%Y%m%dT%H%M%SZ)" "$workdir"
 }
 
+notify_failure() {
+    command -v notify-send >/dev/null || die 'notify-send is not installed.'
+    local log reason='See the logs for details.' id_file="$state_dir/notify-id" id=0
+    log="$(ls -t -- "$state_dir/logs/runner.log" "$state_dir/logs/bisync.log" 2>/dev/null | head -n 1)" || true
+    if [[ -n $log ]]; then
+        reason="$(grep -E 'ERROR' -- "$log" | tail -n 1 | sed -E 's/^.*ERROR :? ?//')" || true
+        [[ -n $reason ]] || reason='See the logs for details.'
+    fi
+    [[ ! -f $id_file ]] || id="$(< "$id_file")"
+    [[ $id =~ ^[0-9]+$ ]] || id=0
+    notify-send -p -r "$id" -u critical -a 'Lecture sync' \
+        'Lecture sync failed' "$reason"$'\n'"Log: $state_dir/logs" > "$id_file.tmp" \
+        && mv -- "$id_file.tmp" "$id_file"
+}
+
 case "${1:-}" in
     set-target) shift; set_target "$@" ;;
     init) [[ $# == 1 ]] || die 'Usage: init'; initialize ;;
@@ -137,5 +152,6 @@ case "${1:-}" in
         note "Local folder: $local_dir"
         note "Log: $state_dir/logs/bisync.log"
         ;;
-    *) die "Usage: $0 {set-target FOLDER_ID FOLDER_NAME|init|run|status}" ;;
+    notify-failure) [[ $# == 1 ]] || die 'Usage: notify-failure'; notify_failure ;;
+    *) die "Usage: $0 {set-target FOLDER_ID FOLDER_NAME|init|run|status|notify-failure}" ;;
 esac

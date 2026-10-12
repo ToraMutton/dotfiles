@@ -1,0 +1,6 @@
+[Unit]
+Description=Notify that the B2 lecture sync failed
+
+[Service]
+Type=oneshot
+ExecStart=%h/dotfiles/scripts/rigel-14-lecture-sync notify-failure

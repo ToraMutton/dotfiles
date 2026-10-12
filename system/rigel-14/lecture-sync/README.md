@@ -50,6 +50,7 @@ Google が外部向けアプリの公開に説明ページを要求する場合�
 - 定期実行は対象フォルダの ID とアクセス確認ファイルを検査する。Drive を読めない間は失敗して止まり、次のタイマーで再試行する。`--resilient --recover` は通常の一時エラーや中断からの回復に使う。
 - 同時変更は双方の `.conflict*` ファイルとして残す。50% を超える削除は停止し、同期で置き換わる旧版はローカルと Drive のバックアップフォルダに退避する。バックアップは自動削除しない。
 - 実行状況: `systemctl --user list-timers rigel-14-lecture-sync.timer`、`systemctl --user status rigel-14-lecture-sync.service`。
+- 同期が失敗すると `rigel-14-lecture-sync-notify.service` がデスクトップ通知を出す。失敗が続いても同じ通知を上書きするので、通知は積み重ならない。
 - 失敗の詳細: `journalctl --user -u rigel-14-lecture-sync.service -n 100 --no-pager`、`tail -n 100 ~/.local/state/rigel-14-lecture-sync/logs/bisync.log`。接続確認など rclone 実行前の失敗は同じ場所の `runner.log` にも残る。
 - `rclone bisync` が再 `--resync` を要求した場合はタイマーを止め、ログと両側のデータ、バックアップを確認してから手動で復旧する。むやみに `--force` や毎回の `--resync` を使わない。
 

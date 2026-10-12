@@ -1,6 +1,7 @@
 [Unit]
 Description=Sync B2 second-semester lectures with Google Drive
 Documentation=https://rclone.org/bisync/
+OnFailure=rigel-14-lecture-sync-notify.service
 
 [Service]
 Type=oneshot
