@@ -1,0 +1,10 @@
+# rigel-14 lecture sync: ビルド中間生成物は同期しない。
+# 同期中に書き換わって md5 不一致 (corrupted on transfer) で bisync が止まるのを防ぐ。
+# PDF とソース (.tex, .c など) は同期する。
+- *.aux
+- *.log
+- *.fls
+- *.out
+- *.fdb_latexmk
+- *.synctex.gz
+- *.o

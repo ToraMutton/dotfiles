@@ -48,6 +48,7 @@ Google が外部向けアプリの公開に説明ページを要求する場合�
 ## 保護と確認
 
 - 定期実行は対象フォルダの ID とアクセス確認ファイルを検査する。Drive を読めない間は失敗して止まり、次のタイマーで再試行する。`--resilient --recover` は通常の一時エラーや中断からの回復に使う。
+- `bisync-filters.txt` で LaTeX や C のビルド中間生成物 (`*.aux`, `*.log`, `*.fdb_latexmk`, `*.synctex.gz`, `*.o` など) を同期対象から外している。同期中に書き換わって md5 不一致 (`corrupted on transfer`) になり bisync が止まるのを防ぐため。このファイルを変更すると rclone が `--resync` を要求するので、タイマーを止め、別の作業ディレクトリで `--resync --resync-mode newer --dry-run` を確認してから実行する。
 - 同時変更は双方の `.conflict*` ファイルとして残す。50% を超える削除は停止し、同期で置き換わる旧版はローカルと Drive のバックアップフォルダに退避する。バックアップは自動削除しない。
 - 実行状況: `systemctl --user list-timers rigel-14-lecture-sync.timer`、`systemctl --user status rigel-14-lecture-sync.service`。
 - 同期が失敗すると `rigel-14-lecture-sync-notify.service` がデスクトップ通知を出す。失敗が続いても同じ通知を上書きするので、通知は積み重ならない。
