@@ -1,6 +1,6 @@
 {
-  "bar": {
-    "persistent": false,
-    "showOnHover": false
-  }
+    "bar": {
+        "persistent": false,
+        "showOnHover": false
+    }
 }
