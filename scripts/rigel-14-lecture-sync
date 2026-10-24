@@ -11,6 +11,7 @@ readonly remote_root="${remote_name}:"
 readonly remote_archive="${remote_root}.rclone-bisync-backups-後期"
 readonly local_archive="$state_dir/backups"
 readonly workdir="$state_dir/bisync"
+readonly filters_file="$(dirname -- "$(readlink -f -- "$0")")/../system/rigel-14/lecture-sync/bisync-filters.txt"
 
 die() {
     printf 'Error: %s\n' "$*" >&2
@@ -55,6 +56,7 @@ run_bisync() {
     shift 2
     rclone --config "$rclone_config" bisync "$local_dir" "$remote_dir" \
         --workdir "$run_workdir" \
+        --filters-file "$filters_file" \
         --check-access --check-filename "$access_file" \
         --max-delete 50 \
         --conflict-resolve none --conflict-loser num \
