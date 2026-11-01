@@ -319,6 +319,7 @@ arch/hypr/.config/hypr/lua/autostart.lua
 │   ├── ai-agents/
 │   ├── bash/
 │   ├── bash-trapezium-08/
+│   ├── browser-update-notify/   # ブラウザ更新の確認・通知 (systemd timer)
 │   ├── caelestia/               # Caelestia 設定と fcitx5-theme/
 │   ├── fastfetch/
 │   ├── fcitx5-rigel-14/

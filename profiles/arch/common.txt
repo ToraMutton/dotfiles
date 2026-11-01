@@ -1,6 +1,7 @@
 # Shared Arch Linux Stow packages
 ai-agents
 bash
+browser-update-notify
 caelestia
 fastfetch
 git

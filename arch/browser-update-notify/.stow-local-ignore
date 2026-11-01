@@ -1,0 +1,4 @@
+# Keep documentation and tests in Git, not in $HOME.
+^/README\.md$
+^/tests$
+^/\.stow-local-ignore$

@@ -1,0 +1,484 @@
+#!/usr/bin/env python3
+"""Check watched browser packages for pending updates and notify the desktop.
+
+This only *looks* for updates. It never installs or upgrades anything, never
+needs sudo, and never refreshes /var/lib/pacman/sync (no partial upgrades).
+
+Exit codes of `check`:
+    0   finished (updates found or not; notification problems are only logged)
+    75  could not fetch update information from at least one source
+    1   unexpected error (e.g. broken configuration)
+"""
+
+import argparse
+import contextlib
+import datetime
+import fcntl
+import html
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+APP = "browser-update-notify"
+EX_TEMPFAIL = 75  # sysexits.h: temporary failure, try again later
+COMMAND_TIMEOUT = 120
+NOTIFY_TIMEOUT = 15
+
+DEFAULT_WATCH = {"google-chrome": "Google Chrome", "chromium": "Chromium"}
+PACKAGE_RE = re.compile(r"^[a-z0-9@._+-]+$")
+UPDATE_RE = re.compile(r"^(\S+) (\S+) -> (\S+)")
+# paru/yay exit 1 both for "no updates" and for failures; this tells them apart.
+FAILURE_RE = re.compile(r"error|fail|time(d)? ?out|could not|unable|cannot", re.I)
+
+
+class SourceError(Exception):
+    """An update source (repo / AUR) could not be queried."""
+
+
+# --------------------------------------------------------------------------
+# logging / paths
+# --------------------------------------------------------------------------
+
+_PRIORITY = {"error": 3, "warning": 4, "info": 6}
+
+
+def log(level, message):
+    """Print a message; under systemd use syslog priority prefixes for journald."""
+    if os.environ.get("JOURNAL_STREAM"):
+        line = f"<{_PRIORITY[level]}>{message}"
+    elif level == "info":
+        line = message
+    else:
+        line = f"{level}: {message}"
+    print(line, file=sys.stdout if level == "info" else sys.stderr, flush=True)
+
+
+def xdg_dir(variable, fallback):
+    value = os.environ.get(variable, "")
+    # The XDG spec says relative paths must be ignored.
+    return Path(value) if value.startswith("/") else Path.home() / fallback
+
+
+def config_file():
+    return xdg_dir("XDG_CONFIG_HOME", ".config") / APP / "packages.conf"
+
+
+def state_dir():
+    return xdg_dir("XDG_STATE_HOME", ".local/state") / APP
+
+
+# --------------------------------------------------------------------------
+# watch list
+# --------------------------------------------------------------------------
+
+def load_watch():
+    """Return {package: display name} in file order."""
+    path = config_file()
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return dict(DEFAULT_WATCH)
+
+    watch = {}
+    for number, raw in enumerate(lines, 1):
+        entry = raw.split("#", 1)[0].strip()
+        if not entry:
+            continue
+        package, _, display = entry.partition(" ")
+        if not PACKAGE_RE.match(package):
+            log("warning", f"{path}:{number}: ignoring invalid package name {package!r}")
+            continue
+        watch[package] = display.strip() or package
+    return watch
+
+
+# --------------------------------------------------------------------------
+# update sources
+# --------------------------------------------------------------------------
+
+def run(command):
+    try:
+        return subprocess.run(
+            command,
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=COMMAND_TIMEOUT,
+            env={**os.environ, "LC_ALL": "C"},  # stable messages for FAILURE_RE
+        )
+    except FileNotFoundError:
+        raise SourceError(f"{command[0]} not found") from None
+    except subprocess.TimeoutExpired:
+        raise SourceError(f"{command[0]} timed out after {COMMAND_TIMEOUT}s") from None
+
+
+def brief(text):
+    """Collapse a command's error output into one short line for logs."""
+    return " ".join(text.split())[:200] or "no message"
+
+
+def parse_updates(text):
+    """Parse `name old -> new` lines into {name: (old, new)}."""
+    updates = {}
+    for line in text.splitlines():
+        match = UPDATE_RE.match(line.strip())
+        if match:
+            updates[match[1]] = (match[2], match[3])
+    return updates
+
+
+def parse_qu(result, label):
+    """Interpret `pacman -Qu`-style output, where rc 1 may mean "nothing to do"."""
+    if result.returncode == 0:
+        return parse_updates(result.stdout)
+    stderr = result.stderr.strip()
+    if result.returncode == 1 and not result.stdout.strip() and not FAILURE_RE.search(stderr):
+        return {}
+    raise SourceError(f"{label} failed (rc={result.returncode}): {brief(stderr)}")
+
+
+def repo_updates():
+    """Updates from the official repositories, without touching the system sync DB."""
+    if shutil.which("checkupdates"):
+        result = run(["checkupdates"])
+        if result.returncode == 0:
+            return parse_updates(result.stdout)
+        if result.returncode == 2:  # documented: no updates available
+            return {}
+        raise SourceError(
+            f"checkupdates failed (rc={result.returncode}): {brief(result.stderr)}"
+        )
+    return repo_updates_private_db()
+
+
+def repo_updates_private_db():
+    """What `checkupdates` does, for machines without pacman-contrib.
+
+    Sync databases are refreshed in a throw-away dbpath, so the real
+    /var/lib/pacman/sync stays untouched and no partial upgrade state is created.
+    """
+    if not shutil.which("fakeroot"):
+        raise SourceError("neither checkupdates (pacman-contrib) nor fakeroot is installed")
+
+    dbpath = Path(run(["pacman-conf", "DBPath"]).stdout.strip() or "/var/lib/pacman")
+    runtime = os.environ.get("XDG_RUNTIME_DIR")
+    with tempfile.TemporaryDirectory(prefix=f"{APP}-", dir=runtime if runtime and os.path.isdir(runtime) else None) as tmp:
+        private = Path(tmp) / "db"
+        private.mkdir()
+        (private / "local").symlink_to(dbpath / "local")
+        try:
+            # copy2 keeps mtimes, so pacman only re-downloads databases that changed
+            shutil.copytree(dbpath / "sync", private / "sync")
+        except OSError as error:
+            raise SourceError(f"cannot copy sync databases: {error}") from None
+
+        # --disable-sandbox: pacman 7's Landlock sandbox cannot be set up under fakeroot
+        sync = run(["fakeroot", "--", "pacman", "-Sy", "--disable-sandbox",
+                    "--dbpath", str(private), "--logfile", "/dev/null"])
+        if sync.returncode != 0:
+            raise SourceError(f"database refresh failed: {brief(sync.stderr)}")
+        return parse_qu(run(["pacman", "-Qu", "--dbpath", str(private)]), "pacman -Qu")
+
+
+def aur_updates():
+    for helper in ("paru", "yay"):
+        if shutil.which(helper):
+            return parse_qu(run([helper, "-Qua"]), f"{helper} -Qua")
+    raise SourceError("no AUR helper (paru/yay) found")
+
+
+def installed_versions(packages):
+    """Return ({installed package: version}, set of those that are foreign/AUR)."""
+    names = list(packages)
+    # rc 1 just means "some of them are not installed"; stdout still lists the rest
+    installed = {}
+    for line in run(["pacman", "-Q", "--", *names]).stdout.splitlines():
+        parts = line.split()
+        if len(parts) == 2:
+            installed[parts[0]] = parts[1]
+    foreign = set()
+    if installed:
+        foreign = set(run(["pacman", "-Qmq", "--", *installed]).stdout.split())
+    return installed, foreign
+
+
+def collect(watch, mock_file):
+    """Return (updates {pkg: (old, new)}, errors [str], installed {pkg: version})."""
+    if mock_file:
+        updates = parse_updates(Path(mock_file).read_text(encoding="utf-8"))
+        return {p: v for p, v in updates.items() if p in watch}, [], {}
+
+    try:
+        installed, foreign = installed_versions(watch)
+    except SourceError as error:
+        return {}, [f"pacman: {error}"], {}
+
+    sources = []
+    if set(installed) - foreign:
+        sources.append(("repo", repo_updates))
+    if foreign:
+        sources.append(("aur", aur_updates))
+
+    updates, errors = {}, []
+    for label, fetch in sources:
+        try:
+            found = fetch()
+        except SourceError as error:
+            errors.append(f"{label}: {error}")
+        else:
+            updates.update({p: v for p, v in found.items() if p in installed})
+    return updates, errors, installed
+
+
+# --------------------------------------------------------------------------
+# state (what was already announced)
+# --------------------------------------------------------------------------
+
+def empty_state():
+    return {"version": 1, "notified": {}, "last_check": None, "last_success": None}
+
+
+def load_state(path):
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        notified = data["notified"]
+        if not (isinstance(notified, dict)
+                and all(isinstance(k, str) and isinstance(v, str) for k, v in notified.items())):
+            raise ValueError("notified must map package names to version strings")
+    except FileNotFoundError:
+        return empty_state()
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        backup = path.with_name(path.name + ".corrupt")
+        with contextlib.suppress(OSError):
+            os.replace(path, backup)
+        log("warning", f"state file was unreadable ({error}); starting fresh (kept as {backup})")
+        return empty_state()
+    return {**empty_state(), **data}
+
+
+def save_state(path, state):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(state, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    os.replace(temporary, path)  # atomic: never leaves a half-written state file
+
+
+@contextlib.contextmanager
+def exclusive_lock(directory):
+    """Yield True if we got the lock; False if another instance is running."""
+    directory.mkdir(parents=True, exist_ok=True)
+    with open(directory / "lock", "a+") as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            yield False
+        else:
+            yield True
+
+
+# --------------------------------------------------------------------------
+# notification
+# --------------------------------------------------------------------------
+
+def notification_server():
+    """Name of the freedesktop notification server on the session bus, or None."""
+    try:
+        result = run(["busctl", "--user", "call", "org.freedesktop.Notifications",
+                      "/org/freedesktop/Notifications", "org.freedesktop.Notifications",
+                      "GetServerInformation"])
+    except SourceError:
+        return None
+    match = re.search(r'"([^"]*)"', result.stdout)
+    return match[1] if result.returncode == 0 and match else None
+
+
+def build_message(lines, test=False):
+    """lines: [(display name, old, new)] -> (summary, body)"""
+    blocks = [f"{html.escape(name)}\n{html.escape(old)} → {html.escape(new)}" for name, old, new in lines]
+    footer = "セキュリティのため、早めの更新をおすすめします。"
+    if test:
+        footer = "※これはテスト通知です(実際の更新ではありません)。"
+    return "🔔 ブラウザのアップデートがあります", "\n\n".join(blocks) + "\n\n" + footer
+
+
+def send_notification(summary, body):
+    """Return True if the notification was handed to the notification server."""
+    if not shutil.which("notify-send"):
+        log("warning", "notify-send not found; cannot show notification")
+        return False
+    server = notification_server()
+    if server is None:
+        log("warning", "no notification server on the session bus; cannot show notification")
+        return False
+    try:
+        result = subprocess.run(
+            ["notify-send", "--app-name", "Browser updates", "--icon", "software-update-available",
+             "--urgency", "normal", "--", summary, body],
+            stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=NOTIFY_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        log("warning", "notify-send timed out")
+        return False
+    if result.returncode != 0:
+        log("warning", f"notify-send failed (rc={result.returncode}): {result.stderr.strip()[:200]}")
+        return False
+    log("info", f"notification sent via {server}")
+    return True
+
+
+# --------------------------------------------------------------------------
+# commands
+# --------------------------------------------------------------------------
+
+def cmd_check(args):
+    watch = load_watch()
+    if not watch:
+        log("error", f"no packages to watch (see {config_file()})")
+        return 1
+
+    directory = state_dir()
+    # Mock runs keep their own state so they can never hide a real update.
+    state_path = directory / ("mock-state.json" if args.mock_updates else "state.json")
+
+    with exclusive_lock(directory) as acquired:
+        if not acquired:
+            log("info", "another check is already running; skipping")
+            return 0
+
+        state = load_state(state_path)
+        updates, errors, _ = collect(watch, args.mock_updates)
+        for error in errors:
+            log("error", f"could not fetch updates ({error})")
+
+        notified = state["notified"]
+        pending = {package: new for package, (_, new) in updates.items()}
+        fresh = [package for package in watch if package in pending and notified.get(package) != pending[package]]
+
+        # Forget packages that are no longer pending, but only if every source
+        # answered; otherwise a flaky network would cause a re-notification later.
+        if not errors:
+            notified = {package: version for package, version in notified.items() if package in pending}
+
+        if updates:
+            summary = ", ".join(f"{p} {old} -> {new}" for p, (old, new) in updates.items())
+            log("info", f"updates available: {summary}")
+        elif not errors:
+            log("info", "no updates for watched browsers")
+
+        if fresh:
+            if args.no_notify:
+                log("info", "new updates found; notification skipped (--no-notify)")
+            else:
+                lines = [(watch[p], *updates[p]) for p in watch if p in updates]
+                if send_notification(*build_message(lines)):
+                    notified = {**notified, **pending}
+                else:
+                    log("warning", "notification not shown; will try again on the next check")
+        elif updates:
+            log("info", "already notified about these updates")
+
+        now = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+        state["notified"] = notified
+        state["last_check"] = {
+            "time": now,
+            "result": "error" if errors else "ok",
+            "updates": len(updates),
+            "errors": errors,
+        }
+        if not errors:
+            state["last_success"] = now
+        save_state(state_path, state)
+
+    return EX_TEMPFAIL if errors else 0
+
+
+def cmd_status(args):
+    watch = load_watch()
+    directory = state_dir()
+    state = load_state(directory / "state.json")
+
+    print(f"Config:  {config_file()}" + ("" if config_file().exists() else "  (not found; using defaults)"))
+    print(f"State:   {directory / 'state.json'}")
+    print()
+
+    try:
+        installed, foreign = installed_versions(watch)
+    except SourceError as error:
+        installed, foreign = {}, set()
+        print(f"(could not query pacman: {error})")
+    print("Watched packages:")
+    for package, display in watch.items():
+        if package in installed:
+            origin = "AUR/foreign" if package in foreign else "repo"
+            detail = f"installed {installed[package]} ({origin})"
+        else:
+            detail = "not installed"
+        notified = state["notified"].get(package)
+        extra = f", already notified about {notified}" if notified else ""
+        print(f"  {package:<20} {display:<20} {detail}{extra}")
+    print()
+
+    last = state["last_check"]
+    if last:
+        print(f"Last check:   {last['time']}  result={last['result']}  updates={last['updates']}")
+        for error in last.get("errors", []):
+            print(f"              error: {error}")
+    else:
+        print("Last check:   never")
+    print(f"Last success: {state['last_success'] or 'never'}")
+    print(f"Notification server: {notification_server() or 'NOT AVAILABLE'}")
+    print()
+    sys.stdout.flush()  # keep our lines ahead of systemctl's output
+    with contextlib.suppress(FileNotFoundError):  # timer info is a bonus, not essential
+        subprocess.run(["systemctl", "--user", "list-timers", "--no-pager", f"{APP}.timer"], check=False)
+    return 0
+
+
+def cmd_notify_test(args):
+    watch = load_watch()
+    lines = [(display, "1.0.0-1", "1.0.1-1") for display in watch.values()]
+    if send_notification(*build_message(lines, test=True)):
+        return 0
+    return 1
+
+
+def cmd_reset(args):
+    removed = False
+    for name in ("state.json", "state.json.corrupt", "mock-state.json"):
+        with contextlib.suppress(FileNotFoundError):
+            (state_dir() / name).unlink()
+            removed = True
+    log("info", "state cleared; current updates will be announced again" if removed else "no state to clear")
+    return 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(prog=APP, description=__doc__.split("\n\n")[0])
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    check = commands.add_parser("check", help="look for updates and notify about new ones")
+    check.add_argument("--mock-updates", metavar="FILE",
+                       help="read 'name old -> new' lines from FILE instead of querying pacman/AUR")
+    check.add_argument("--no-notify", action="store_true", help="detect only; do not show a notification")
+    check.set_defaults(handler=cmd_check)
+
+    commands.add_parser("status", help="show watched packages and the last check").set_defaults(handler=cmd_status)
+    commands.add_parser("notify-test", help="show a sample notification").set_defaults(handler=cmd_notify_test)
+    commands.add_parser("reset", help="forget what was already notified").set_defaults(handler=cmd_reset)
+
+    args = parser.parse_args(argv)
+    try:
+        return args.handler(args)
+    except OSError as error:
+        log("error", str(error))
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

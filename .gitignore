@@ -18,3 +18,6 @@ arch/mozc*/.config/mozc/.registry
 
 # Local, host-specific power incident records and diagnostics
 /document/rigel-14-power/
+
+# Python bytecode caches
+__pycache__/

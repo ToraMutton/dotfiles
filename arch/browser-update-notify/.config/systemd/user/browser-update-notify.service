@@ -1,0 +1,12 @@
+[Unit]
+Description=Check browser packages for pending updates and notify (check only, never upgrades)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/browser-update-notify check
+# 75 = could not fetch update information. It is logged as an error in the
+# journal, but is not a unit failure: the next timer run simply tries again.
+SuccessExitStatus=75
+TimeoutStartSec=10min
+NoNewPrivileges=yes
+Nice=10

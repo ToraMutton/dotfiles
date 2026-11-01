@@ -1,0 +1,13 @@
+[Unit]
+Description=Check browser updates a few minutes after login and every six hours
+
+[Timer]
+# Counted from the start of the user manager, i.e. every login (also after a shutdown).
+OnStartupSec=3min
+# Counted from the end of the previous run, so a slow or failed run never piles up.
+OnUnitInactiveSec=6h
+AccuracySec=1min
+Unit=browser-update-notify.service
+
+[Install]
+WantedBy=timers.target
