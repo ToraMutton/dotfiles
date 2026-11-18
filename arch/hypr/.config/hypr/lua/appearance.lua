@@ -34,11 +34,15 @@ hl.config({
         active_opacity = 1.0,
         inactive_opacity = 1.0,
 
+        -- Elevation: light from above (y offset), focused window sits higher
+        -- (stronger shadow). Transition follows the `fade` leaf (fadeShadow).
         shadow = {
             enabled = true,
-            range = 8,
+            range = 14,
             render_power = 3,
+            offset = "0 3",
             color = "rgba(1a1a1aaa)",
+            color_inactive = "rgba(1a1a1a44)",
         },
 
         blur = {
@@ -64,30 +68,12 @@ hl.config({
 --   * Enter = decelerate (ease-out), exit = accelerate
 --   * No overshoot on large (full-screen) or exit motion
 
--- General-purpose Bezier curves
-
-hl.curve("easeOutQuint", {
-    type = "bezier",
-    points = {
-        { 0.23, 1 },
-        { 0.32, 1 },
-    },
-})
-
--- Material 3 motion tokens
+-- Bezier curves (Material 3 motion tokens)
 hl.curve("standardDecel", {
     type = "bezier",
     points = {
         { 0, 0 },
         { 0, 1 },
-    },
-})
-
-hl.curve("emphasizedDecel", {
-    type = "bezier",
-    points = {
-        { 0.05, 0.7 },
-        { 0.1,  1 },
     },
 })
 
@@ -158,13 +144,6 @@ hl.animation({
 -- =============================================================================
 
 hl.animation({
-    leaf = "windows",
-    enabled = true,
-    speed = 4.79,
-    bezier = "easeOutQuint",
-})
-
-hl.animation({
     leaf = "windowsIn",
     enabled = true,
     speed = 4,
@@ -196,7 +175,9 @@ hl.animation({
     enabled = true,
     speed = 4.4,
     spring = "workspaceSpring",
-    style = "slide",
+    -- Trial: move only 20% of the width and crossfade the rest
+    -- (less large-field motion, direction cue kept). Revert: "slide"
+    style = "slidefade 20%",
 })
 
 -- =============================================================================
