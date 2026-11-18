@@ -57,6 +57,13 @@ hl.config({
 -- Animation curves
 -- =============================================================================
 
+-- Design principles
+--   * Duration tiers: 100 / 150 / 225 / 350 ms (geometric x1.5; time-perception
+--     Weber fraction is ~10-20%, so neighbouring tiers stay distinguishable)
+--   * Longer travel -> longer duration; exit is faster than enter
+--   * Enter = decelerate (ease-out), exit = accelerate
+--   * No overshoot on large (full-screen) or exit motion
+
 -- General-purpose Bezier curves
 
 hl.curve("easeOutQuint", {
@@ -67,42 +74,72 @@ hl.curve("easeOutQuint", {
     },
 })
 
-hl.curve("quick", {
+-- Material 3 motion tokens
+hl.curve("standardDecel", {
     type = "bezier",
     points = {
-        { 0.15, 0 },
+        { 0, 0 },
+        { 0, 1 },
+    },
+})
+
+hl.curve("emphasizedDecel", {
+    type = "bezier",
+    points = {
+        { 0.05, 0.7 },
         { 0.1,  1 },
     },
 })
 
--- Physical spring curves
+hl.curve("emphasizedAccel", {
+    type = "bezier",
+    points = {
+        { 0.3, 0 },
+        { 0.8, 0.15 },
+    },
+})
 
+-- Physical spring curves
+--   Parameterised by response T (s) and damping ratio zeta (mass = 1):
+--     stiffness = (2*pi / T)^2
+--     dampening = 4*pi * zeta / T
+--   zeta = 1.0 -> no overshoot, smaller -> bouncier.
+--   Springs are integrated in real time, so the leaf `speed` likely has no effect.
+
+-- T=0.40s, zeta=1.00 | full-screen travel: longest tier, no bounce
+--   t90 ~248ms, settle(2%) ~372ms
 hl.curve("workspaceSpring", {
     type = "spring",
     mass = 1,
-    stiffness = 220,
-    dampening = 30,
+    stiffness = 247,
+    dampening = 31.4,
 })
 
+-- T=0.32s, zeta=0.82 | enter: slight life (~1% overshoot)
+--   t90 ~156ms, settle(2%) ~200ms
 hl.curve("windowInSpring", {
     type = "spring",
     mass = 1,
-    stiffness = 260,
-    dampening = 22,
+    stiffness = 386,
+    dampening = 32.2,
 })
 
+-- T=0.22s, zeta=1.00 | exit: faster than enter, no bounce
+--   t90 ~137ms, settle(2%) ~205ms
 hl.curve("windowOutSpring", {
     type = "spring",
     mass = 1,
-    stiffness = 300,
-    dampening = 26,
+    stiffness = 816,
+    dampening = 57.1,
 })
 
+-- T=0.30s, zeta=0.90 | move: practically no overshoot, smooth on retarget
+--   t90 ~163ms, settle(2%) ~225ms
 hl.curve("windowMoveSpring", {
     type = "spring",
     mass = 1,
-    stiffness = 240,
-    dampening = 24,
+    stiffness = 439,
+    dampening = 37.7,
 })
 
 -- =============================================================================
@@ -112,7 +149,7 @@ hl.curve("windowMoveSpring", {
 hl.animation({
     leaf = "global",
     enabled = true,
-    speed = 10,
+    speed = 3.5, -- fallback: longest tier (350ms)
     bezier = "default",
 })
 
@@ -178,8 +215,15 @@ hl.animation({
 hl.animation({
     leaf = "fade",
     enabled = true,
-    speed = 3,
-    bezier = "quick",
+    speed = 1.5, -- 150ms: opacity change has no travel distance
+    bezier = "standardDecel",
+})
+
+hl.animation({
+    leaf = "fadeOut",
+    enabled = true,
+    speed = 1, -- 100ms: exit is faster, accelerating away
+    bezier = "emphasizedAccel",
 })
 
 -- =============================================================================
@@ -189,8 +233,8 @@ hl.animation({
 hl.animation({
     leaf = "border",
     enabled = true,
-    speed = 3,
-    bezier = "easeOutQuint",
+    speed = 1.5, -- 150ms: focus feedback should feel near-instant
+    bezier = "standardDecel",
 })
 
 -- =============================================================================
